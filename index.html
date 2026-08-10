@@ -4,6 +4,23 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
     <title>نظام إدارة السوبر ماركت</title>
+      <meta charset="UTF-8" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <!-- ===== Leaflet CSS ===== -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json?v=3">
+<meta name="theme-color" content="#0d6efd">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="إدارة النقود">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
+
+
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.rtl.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -1680,6 +1697,7 @@
         </div>
     </div>
 </div>
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -9709,269 +9727,148 @@ document.getElementById('confirmDialog').addEventListener('click', function(e) {
 
         console.log('نظام إدارة المستخدمين والمنتجات - صف الإدخال في الجدول');
 
-        
-        // ===================================================================
-// نظام التثبيت كـ PWA (تطبيق ويب تقدمي)
-// ===================================================================
 
-// 1. توليد أيقونات التطبيق باستخدام Canvas
-function generateAppIcon(size) {
-    const canvas = document.createElement('canvas');
-    canvas.width = size;
-    canvas.height = size;
-    const ctx = canvas.getContext('2d');
-
-    // خلفية متدرجة
-    const gradient = ctx.createLinearGradient(0, 0, size, size);
-    gradient.addColorStop(0, '#1e2a5a');
-    gradient.addColorStop(1, '#2a3a7a');
-    ctx.fillStyle = gradient;
-    // مستطيل دائري الزوايا
-    const radius = size * 0.2;
-    ctx.beginPath();
-    ctx.moveTo(radius, 0);
-    ctx.lineTo(size - radius, 0);
-    ctx.quadraticCurveTo(size, 0, size, radius);
-    ctx.lineTo(size, size - radius);
-    ctx.quadraticCurveTo(size, size, size - radius, size);
-    ctx.lineTo(radius, size);
-    ctx.quadraticCurveTo(0, size, 0, size - radius);
-    ctx.lineTo(0, radius);
-    ctx.quadraticCurveTo(0, 0, radius, 0);
-    ctx.closePath();
-    ctx.fill();
-
-    // رسم شعار (عربة تسوق)
-    ctx.fillStyle = 'white';
-    ctx.font = `bold ${size * 0.45}px Arial, sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('🛒', size / 2, size / 2 + size * 0.05);
-
-    // إضافة نص صغير "سوق"
-    ctx.font = `bold ${size * 0.12}px Tahoma, sans-serif`;
-    ctx.fillStyle = 'rgba(255,255,255,0.9)';
-    ctx.fillText('سوق', size / 2, size * 0.85);
-
-    return canvas.toDataURL('image/png');
-}
-
-// توليد الأيقونات بالأحجام المطلوبة
-const icon192 = generateAppIcon(192);
-const icon512 = generateAppIcon(512);
-
-// 2. إنشاء ملف Manifest ديناميكياً
-function createManifest() {
-    const manifest = {
-        name: 'نظام السوبر ماركت',
-        short_name: 'سوبر ماركت',
-        description: 'نظام إدارة متكامل للسوبر ماركت',
-        start_url: '.',
-        display: 'standalone',
-        background_color: '#1e2a5a',
-        theme_color: '#1e2a5a',
-        orientation: 'portrait',
-        icons: [
-            { src: icon192, sizes: '192x192', type: 'image/png', purpose: 'any' },
-            { src: icon512, sizes: '512x512', type: 'image/png', purpose: 'any' },
-            { src: icon192, sizes: '192x192', type: 'image/png', purpose: 'maskable' }
-        ]
-    };
-    const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
-    const manifestURL = URL.createObjectURL(blob);
-    const link = document.createElement('link');
-    link.rel = 'manifest';
-    link.href = manifestURL;
-    document.head.appendChild(link);
-}
-
-// 3. إنشاء Service Worker ديناميكياً (للتخزين المؤقت والعمل دون اتصال)
-function registerServiceWorker() {
-    if (!('serviceWorker' in navigator)) {
-        console.log('Service Worker غير مدعوم في هذا المتصفح');
-        return;
+    </script>
+<script>
+    // ===== تسجيل Service Worker =====
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('./service-worker.js')
+                .then(function(registration) {
+                    console.log('✅ Service Worker registered:', registration.scope);
+                })
+                .catch(function(error) {
+                    console.log('❌ Service Worker error:', error);
+                });
+        });
     }
 
-    // كود الـ Service Worker (سيتم تخزين الأيقونات والملف الحالي)
-    const swCode = `
-        const CACHE_NAME = 'supermarket-v1';
-        const urlsToCache = [
-            '.',
-            '${icon192}',
-            '${icon512}'
-        ];
+    // ===== زر تثبيت PWA =====
+    let deferredPrompt;
 
-        self.addEventListener('install', event => {
-            event.waitUntil(
-                caches.open(CACHE_NAME)
-                    .then(cache => {
-                        console.log('تم فتح الكاش');
-                        return cache.addAll(urlsToCache);
-                    })
-                    .then(() => self.skipWaiting())
-            );
-        });
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        showInstallButtonInPage();
+    });
 
-        self.addEventListener('activate', event => {
-            event.waitUntil(
-                caches.keys().then(cacheNames => {
-                    return Promise.all(
-                        cacheNames.map(name => {
-                            if (name !== CACHE_NAME) {
-                                return caches.delete(name);
-                            }
-                        })
-                    );
-                }).then(() => self.clients.claim())
-            );
-        });
-
-        self.addEventListener('fetch', event => {
-            event.respondWith(
-                caches.match(event.request)
-                    .then(response => response || fetch(event.request))
-                    .catch(() => {
-                        // في حالة عدم الاتصال بالإنترنت، نقدم صفحة بسيطة
-                        return caches.match('.');
-                    })
-            );
-        });
-    `;
-
-    // تحويل كود الـ SW إلى Blob URL
-    const swBlob = new Blob([swCode], { type: 'application/javascript' });
-    const swURL = URL.createObjectURL(swBlob);
-
-    // تسجيل الـ Service Worker
-    navigator.serviceWorker.register(swURL)
-        .then(reg => console.log('✅ Service Worker مسجل بنجاح', reg))
-        .catch(err => console.error('❌ فشل تسجيل Service Worker', err));
-}
-
-// 4. إدارة زر التثبيت
-let deferredPrompt = null;
-
-// إظهار / إخفاء زر التثبيت حسب الحدث
-window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    const btn = document.getElementById('installAppBtn');
-    if (btn) btn.style.display = 'inline-flex';
-    // أيضاً إظهار البطاقة في شاشة الترحيب إن وجدت
-    const welcomeCard = document.querySelector('.welcome-card[data-install="true"]');
-    if (welcomeCard) welcomeCard.style.display = 'flex';
-});
-
-window.addEventListener('appinstalled', () => {
-    const btn = document.getElementById('installAppBtn');
-    if (btn) btn.style.display = 'none';
-    const welcomeCard = document.querySelector('.welcome-card[data-install="true"]');
-    if (welcomeCard) welcomeCard.style.display = 'none';
-    deferredPrompt = null;
-    showToast('✅ تم تثبيت التطبيق بنجاح!', 'success');
-});
-
-// دالة التثبيت عند الضغط على الزر
-function installApp() {
-    if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then((result) => {
-            if (result.outcome === 'accepted') {
-                console.log('✅ تم قبول التثبيت');
-            } else {
-                console.log('❌ تم رفض التثبيت');
+    function showInstallButtonInPage() {
+        if (document.getElementById('pwaInstallBtn')) return;
+        
+        const installContainer = document.createElement('div');
+        installContainer.id = 'pwaInstallContainer';
+        installContainer.style.cssText = `
+            position: fixed; 
+            bottom: 20px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            z-index: 9999; 
+            width: auto; 
+            text-align: center;
+        `;
+        
+        const installBtn = document.createElement('button');
+        installBtn.id = 'pwaInstallBtn';
+        installBtn.innerHTML = '📱 تثبيت التطبيق على الجهاز';
+        installBtn.style.cssText = `
+            background: linear-gradient(135deg, #0d6efd, #0a58ca); 
+            color: white; 
+            border: none; 
+            border-radius: 10px; 
+            padding: 14px 28px; 
+            font-size: 16px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
+            transition: all 0.3s ease; 
+            font-family: 'Cairo', sans-serif; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            margin: 0 auto;
+        `;
+        
+        installBtn.onmouseover = () => {
+            installBtn.style.transform = 'scale(1.05)';
+            installBtn.style.boxShadow = '0 6px 20px rgba(0,0,0,0.3)';
+        };
+        installBtn.onmouseout = () => {
+            installBtn.style.transform = 'scale(1)';
+            installBtn.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
+        };
+        
+        installBtn.onclick = async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                hideInstallButton();
+                showToastMessage('🎉 تم تثبيت التطبيق بنجاح!', 'success');
             }
             deferredPrompt = null;
-            document.getElementById('installAppBtn').style.display = 'none';
-        });
-    } else {
-        showToast('⚠️ التثبيت غير متاح حالياً، حاول استخدام متصفح مدعوم (Chrome/Edge)', 'warning');
-    }
-}
-
-// 5. إضافة زر التثبيت في شريط التنقل (تعديل دالة buildNavbar)
-// نقوم بتعديل الدالة الأصلية بإضافة الزر
-const originalBuildNavbar = window.buildNavbar || function() {};
-
-window.buildNavbar = function() {
-    // استدعاء الدالة الأصلية أولاً
-    if (typeof originalBuildNavbar === 'function') {
-        originalBuildNavbar.call(this);
+        };
+        
+        installContainer.appendChild(installBtn);
+        document.body.appendChild(installContainer);
     }
 
-    // إضافة زر التثبيت إن لم يكن موجوداً
-    const navActions = document.getElementById('navActions');
-    if (!document.getElementById('installAppBtn')) {
-        const installBtn = document.createElement('button');
-        installBtn.id = 'installAppBtn';
-        installBtn.className = 'nav-btn';
-        installBtn.style.display = 'none'; // يظهر فقط عند توفر التثبيت
-        installBtn.innerHTML = '<i class="fas fa-download"></i> تثبيت';
-        installBtn.addEventListener('click', installApp);
-        // نضعه قبل زر الخروج
-        const logoutBtn = navActions.querySelector('.logout-btn-nav');
-        if (logoutBtn) {
-            navActions.insertBefore(installBtn, logoutBtn);
-        } else {
-            navActions.appendChild(installBtn);
+    function hideInstallButton() {
+        const container = document.getElementById('pwaInstallContainer');
+        if (container) {
+            container.style.transition = 'opacity 0.3s ease';
+            container.style.opacity = '0';
+            setTimeout(() => {
+                if (container && container.parentNode) container.remove();
+            }, 300);
         }
     }
-};
 
-// 6. إضافة بطاقة "تثبيت التطبيق" في شاشة الترحيب
-// تعديل دالة renderWelcomeCards
-const originalRenderWelcome = window.renderWelcomeCards || function() {};
-
-window.renderWelcomeCards = function() {
-    if (typeof originalRenderWelcome === 'function') {
-        originalRenderWelcome.call(this);
+    // ===== التحقق من أن التطبيق مثبت =====
+    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+        console.log('📱 التطبيق يعمل بشكل مثبت');
+        // إخفاء زر التثبيت إذا كان التطبيق مثبتاً
+        hideInstallButton();
     }
 
-    const grid = document.getElementById('welcomeGrid');
-    // نتأكد من عدم وجود البطاقة مكررة
-    if (!document.querySelector('.welcome-card[data-install="true"]')) {
-        const installCard = document.createElement('div');
-        installCard.className = 'welcome-card';
-        installCard.setAttribute('data-install', 'true');
-        installCard.style.display = 'none'; // تظهر فقط عند توفر التثبيت
-        installCard.innerHTML = `
-            <span class="welcome-card-icon"><i class="fas fa-download"></i></span>
-            <div class="welcome-card-title">تثبيت التطبيق</div>
+    // ===== عند تثبيت التطبيق =====
+    window.addEventListener('appinstalled', () => {
+        hideInstallButton();
+        showToastMessage('🎉 تم تثبيت التطبيق بنجاح!', 'success');
+    });
+
+    // ===== دالة عرض رسالة منبثقة =====
+    function showToastMessage(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            position: fixed; 
+            top: 20px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            background: ${type === 'success' ? '#2e7d32' : '#0d6efd'}; 
+            color: white; 
+            padding: 12px 24px; 
+            border-radius: 50px; 
+            z-index: 100000; 
+            font-weight: bold; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
+            font-family: 'Cairo', sans-serif; 
+            font-size: 14px; 
+            text-align: center; 
+            white-space: nowrap;
+            animation: fadeIn 0.3s ease;
         `;
-        installCard.addEventListener('click', installApp);
-        grid.appendChild(installCard);
+        toast.innerHTML = `✅ ${message}`;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transition = 'opacity 0.3s ease';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
     }
-};
 
-// 7. تهيئة الـ PWA عند تحميل الصفحة
-function initPWA() {
-    createManifest();
-    registerServiceWorker();
-
-    // التحقق من وجود زر التثبيت في شريط التنقل بعد بناء الواجهة
-    // نستمع لتغيير DOM أو ننفذ بعد فترة
-    setTimeout(() => {
-        if (!document.getElementById('installAppBtn')) {
-            // إذا لم يتم بناء الزر بعد، نستدعي buildNavbar يدوياً
-            if (currentUser) {
-                window.buildNavbar();
-            }
-        }
-    }, 500);
-}
-
-// تشغيل التهيئة بعد تحميل الصفحة
-if (document.readyState === 'complete') {
-    initPWA();
-} else {
-    window.addEventListener('load', initPWA);
-}
-
-// إعادة تعيين البطاقات عند تسجيل الدخول (لضمان ظهور بطاقة التثبيت)
-// نستدعي renderWelcomeCards بعد تسجيل الدخول مباشرة (موجود مسبقاً، لكننا نضمن إضافة البطاقة)
-console.log('✅ تم تفعيل نظام التثبيت (PWA)');
-    </script>
-
+    console.log('✅ كود PWA يعمل');
+</script>
     
 
 
