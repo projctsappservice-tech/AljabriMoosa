@@ -1,7 +1,7 @@
 {
-  "name": "نظام إدارة توصيل الطلبات",
-  "short_name": "توصيل الطلبات",
-  "description": "نظام متكامل لإدارة توصيل الطلبات",
+  "name": "إدارة المتجر",
+  "short_name": "إدارة المتجر",
+  "description": "نظام متكامل لإدارة المتجر",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
