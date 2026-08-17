@@ -9,7 +9,7 @@
     <!-- ===== Leaflet CSS ===== -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=5">
+<link rel="manifest" href="manifest.json?v=6">
 <meta name="theme-color" content="#0d6efd">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
@@ -108,7 +108,31 @@
             overflow: hidden; padding: 15px;
         }
         .login-logo img { width: 100%; height: 100%; object-fit: contain; }
-        .login-company-name { text-align: center; color: #1e2a5a; font-size: clamp(1.1rem, 2.5vw, 1.5rem); font-weight: bold; margin-bottom: 10px; }
+        .login-company-name {
+    text-align: center;
+    color: #1e2a5a;
+    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+    font-weight: bold;
+    margin-bottom: 10px;
+    line-height: 1.4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.login-company-name span {
+    display: block;
+}
+
+.login-company-name #loginCompanyLine1 {
+    font-size: clamp(1.3rem, 3vw, 1.8rem);
+}
+
+.login-company-name #loginCompanyLine2 {
+    font-size: clamp(1rem, 2.2vw, 1.4rem);
+    color: #2a3a7a;
+}
         .login-title { text-align: center; color: #1e2a5a; font-size: clamp(1.3rem, 3vw, 1.8rem); font-weight: bold; margin-bottom: 5px; }
         .login-subtitle { text-align: center; color: #6c757d; font-size: clamp(0.8rem, 1.2vw, 1rem); margin-bottom: 25px; }
         .login-card .form-control {
@@ -774,7 +798,10 @@
             <div class="login-logo">
                 <img src="https://via.placeholder.com/120/1e2a5a/ffffff?text=Logo" alt="Logo" id="loginLogo" />
             </div>
-            <div class="login-company-name" id="loginCompanyName">السوبر ماركت</div>
+            <div class="login-company-name" id="loginCompanyName">
+    <span id="loginCompanyLine1">السوبر</span>
+    <span id="loginCompanyLine2">ماركت</span>
+</div>
             <div class="login-title">تسجيل الدخول</div>
             <div class="login-subtitle">أدخل بياناتك للوصول إلى النظام</div>
             <form id="loginForm">
@@ -11781,6 +11808,32 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
+// دالة لتقسيم اسم الشركة إلى سطرين
+function splitCompanyName(name) {
+    if (!name || name.trim() === '') {
+        return { line1: 'السوبر', line2: 'ماركت' };
+    }
+    
+    name = name.trim();
+    const words = name.split(' ');
+    
+    // إذا كان الاسم يتكون من كلمتين أو أقل
+    if (words.length <= 2) {
+        return {
+            line1: words[0] || 'السوبر',
+            line2: words[1] || 'ماركت'
+        };
+    }
+    
+    // إذا كان الاسم طويلاً، نقسمه إلى نصفين
+    const mid = Math.floor(words.length / 2);
+    const line1 = words.slice(0, mid).join(' ');
+    const line2 = words.slice(mid).join(' ');
+    
+    return { line1, line2 };
+}
+
+
 // ===== جلب بيانات الشركة =====
 function loadCompanyData() {
     return callCompanyScript('read')
@@ -11800,11 +11853,23 @@ function loadCompanyData() {
                     document.getElementById('loginLogo').src = c.CompLogo;
                     document.getElementById('welcomeLogo').src = c.CompLogo;
                 }
-                const loginNameEl = document.getElementById('loginCompanyName');
-                if (loginNameEl) loginNameEl.textContent = c.CompName || 'السوبر ماركت';
+                
+                // ===== تحديث اسم الشركة في نافذة الدخول (سطرين) =====
+                const loginNameContainer = document.getElementById('loginCompanyName');
+                if (loginNameContainer) {
+                    const companyName = c.CompName || 'السوبر ماركت';
+                    const nameParts = splitCompanyName(companyName);
+                    document.getElementById('loginCompanyLine1').textContent = nameParts.line1;
+                    document.getElementById('loginCompanyLine2').textContent = nameParts.line2;
+                }
+                
+                // ===== تحديث اسم الشركة في شاشة الترحيب (سطر واحد) =====
                 const welcomeCompanyEl = document.querySelector('.welcome-company');
-                if (welcomeCompanyEl) welcomeCompanyEl.textContent = c.CompName || 'السوبر ماركت';
+                if (welcomeCompanyEl) {
+                    welcomeCompanyEl.textContent = c.CompName || 'السوبر ماركت';
+                }
 
+                // ===== باقي الكود كما هو =====
                 document.getElementById('compNO').value = c.CompNO || '';
                 document.getElementById('compPO').value = c.CompPO || '';
                 document.getElementById('compPOBox').value = c.CompPOBox || '';
