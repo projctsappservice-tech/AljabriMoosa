@@ -9,7 +9,7 @@
     <!-- ===== Leaflet CSS ===== -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=6">
+<link rel="manifest" href="manifest.json?v=7">
 <meta name="theme-color" content="#0d6efd">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
@@ -1274,19 +1274,53 @@
 </div>
 
             <!-- نافذة الزبائن المنبثقة -->
-           <div id="customers-popup" class="popup-window" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); backdrop-filter:blur(5px); justify-content:center; align-items:center; z-index:10000;">
+         <div id="customers-popup" class="popup-window" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); backdrop-filter:blur(5px); justify-content:center; align-items:center; z-index:10000;">
     <div class="popup-content" style="background:white; border-radius:20px; width:90%; max-width:950px; max-height:80vh; overflow:hidden; display:flex; flex-direction:column;">
         <div class="popup-header" style="padding:12px 20px; background:#667eea; color:white; display:flex; justify-content:space-between; align-items:center;">
             <h3 style="margin:0;"><i class="fas fa-users"></i> اختر الزبون</h3>
             <button class="btn-close" onclick="closeCustomersPopup()" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:white;">×</button>
         </div>
+        
+        <!-- شريط البحث + زر الإضافة -->
         <div class="search-container" style="padding:15px; background:#f8f9fa; border-bottom:1px solid #dee2e6;">
-            <div class="search-box" style="display:flex; gap:5px; align-items:center; background:white; border:2px solid #dee2e6; border-radius:8px; padding:0 8px; transition:0.2s; height:40px;">
-                <i class="fas fa-search" style="color:#667eea;"></i>
-                <input type="text" id="popup-customer-search" class="form-control" placeholder="بحث بالاسم أو رقم الهاتف..." onkeyup="searchPopupCustomers()" style="border:none; padding:10px 8px; flex:1; background:transparent;">
-                <button class="btn btn-info" onclick="searchPopupCustomers()" style="padding:8px 15px; border:none; border-radius:8px; cursor:pointer; font-weight:500; display:inline-flex; align-items:center; gap:8px; transition:0.2s; white-space:nowrap; background:#20aafa; color:white;">بحث</button>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                <div class="search-box" style="display:flex; flex:1; gap:5px; align-items:center; background:white; border:2px solid #dee2e6; border-radius:8px; padding:0 8px; transition:0.2s; height:40px; min-width:200px;">
+                    <i class="fas fa-search" style="color:#667eea;"></i>
+                    <input type="text" id="popup-customer-search" class="form-control" placeholder="بحث بالاسم أو رقم الهاتف..." onkeyup="searchPopupCustomers()" style="border:none; padding:10px 8px; flex:1; background:transparent;">
+                    <button class="btn btn-info" onclick="searchPopupCustomers()" style="padding:8px 15px; border:none; border-radius:8px; cursor:pointer; font-weight:500; display:inline-flex; align-items:center; gap:8px; transition:0.2s; white-space:nowrap; background:#20aafa; color:white;">بحث</button>
+                </div>
+                <!-- زر إضافة زبون جديد -->
+                <button id="popupAddCustomerBtn" class="btn btn-success" onclick="showPopupCustomerAddRow()" style="padding:8px 18px; border:none; border-radius:8px; cursor:pointer; font-weight:500; display:inline-flex; align-items:center; gap:8px; transition:0.2s; white-space:nowrap; background:#28a745; color:white; height:40px;">
+                    <i class="fas fa-user-plus"></i> إضافة زبون
+                </button>
+            </div>
+            
+            <!-- صف إدخال الزبون الجديد (مخفي افتراضياً) -->
+            <div id="popupCustomerAddRow" style="display:none; margin-top:12px; padding:12px 15px; background:#e8f5e9; border-radius:10px; border:2px solid #28a745;">
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap:8px;">
+                    <input type="text" id="popupInputCusID" class="form-control form-control-sm" placeholder="رقم المدني" style="border:2px solid #28a745; border-radius:6px; padding:6px 10px;" />
+                    <input type="text" id="popupInputCusName" class="form-control form-control-sm" placeholder="اسم الزبون *" style="border:2px solid #28a745; border-radius:6px; padding:6px 10px;" />
+                    <input type="text" id="popupInputCusPhone" class="form-control form-control-sm" placeholder="هاتف الزبون *" style="border:2px solid #28a745; border-radius:6px; padding:6px 10px;" />
+                    <input type="text" id="popupInputCusLocation" class="form-control form-control-sm" placeholder="موقع الزبون" style="border:2px solid #28a745; border-radius:6px; padding:6px 10px;" />
+                    <select id="popupInputCusState" class="form-select form-select-sm" style="border:2px solid #28a745; border-radius:6px; padding:6px 10px;">
+                        <option value="الفئة الماسية">الفئة الماسية</option>
+                        <option value="الفئة الذهبية">الفئة الذهبية</option>
+                        <option value="الفئة البرونزية">الفئة البرونزية</option>
+                        <option value="الفئة الفضية" selected>الفئة الفضية</option>
+                    </select>
+                    <div style="display:flex; gap:6px; align-items:center;">
+                        <button class="btn btn-success btn-sm" onclick="savePopupCustomer()" style="padding:6px 16px; border:none; border-radius:6px; cursor:pointer; font-weight:500; background:#28a745; color:white; white-space:nowrap;">
+                            <i class="fas fa-save"></i> حفظ
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="hidePopupCustomerAddRow()" style="padding:6px 16px; border:none; border-radius:6px; cursor:pointer; font-weight:500; background:#6c757d; color:white; white-space:nowrap;">
+                            <i class="fas fa-times"></i> إلغاء
+                        </button>
+                    </div>
+                </div>
+                <div id="popupCustomerAddError" style="color:#dc3545; font-size:0.85rem; margin-top:6px; display:none;"></div>
             </div>
         </div>
+        
         <div class="table-responsive" style="overflow-x:auto; max-height:400px; overflow-y:auto; margin:15px 0;">
             <table id="popup-customers-table" style="width:100%; min-width:700px; display:table; border-collapse:collapse; background:white;">
                 <thead>
@@ -5806,6 +5840,160 @@ function printPreview() {
     showToast(`✅ تم اختيار الزبون: ${customer.name} (${purchaseCount} مشتريات، ${purchaseTotal.toFixed(2)} ر.س)`, 'success');
 }
 
+// ===================================================================
+// دوال إضافة زبون من نافذة الزبائن المنبثقة في الكاشير
+// ===================================================================
+
+// إظهار صف إدخال الزبون الجديد
+function showPopupCustomerAddRow() {
+    const row = document.getElementById('popupCustomerAddRow');
+    if (row.style.display === 'none' || row.style.display === '') {
+        row.style.display = 'block';
+        // تنظيف الحقول
+        document.getElementById('popupInputCusID').value = '';
+        document.getElementById('popupInputCusName').value = '';
+        document.getElementById('popupInputCusPhone').value = '';
+        document.getElementById('popupInputCusLocation').value = '';
+        document.getElementById('popupInputCusState').value = 'الفئة الفضية';
+        document.getElementById('popupCustomerAddError').style.display = 'none';
+        // التركيز على حقل الاسم
+        setTimeout(() => document.getElementById('popupInputCusName').focus(), 100);
+        // تغيير لون الزر
+        document.getElementById('popupAddCustomerBtn').style.background = '#dc3545';
+        document.getElementById('popupAddCustomerBtn').innerHTML = '<i class="fas fa-times"></i> إغلاق الإضافة';
+    } else {
+        hidePopupCustomerAddRow();
+    }
+}
+
+// إخفاء صف إدخال الزبون الجديد
+function hidePopupCustomerAddRow() {
+    const row = document.getElementById('popupCustomerAddRow');
+    row.style.display = 'none';
+    document.getElementById('popupCustomerAddError').style.display = 'none';
+    document.getElementById('popupAddCustomerBtn').style.background = '#28a745';
+    document.getElementById('popupAddCustomerBtn').innerHTML = '<i class="fas fa-user-plus"></i> إضافة زبون';
+}
+
+// حفظ الزبون الجديد من النافذة المنبثقة
+function savePopupCustomer() {
+    const cusID = document.getElementById('popupInputCusID').value.trim();
+    const name = document.getElementById('popupInputCusName').value.trim();
+    const phone = document.getElementById('popupInputCusPhone').value.trim();
+    const location = document.getElementById('popupInputCusLocation').value.trim();
+    const state = document.getElementById('popupInputCusState').value;
+    const errorDiv = document.getElementById('popupCustomerAddError');
+    
+    // التحقق من الحقول المطلوبة
+    if (!name) {
+        errorDiv.textContent = '⚠️ اسم الزبون مطلوب';
+        errorDiv.style.display = 'block';
+        document.getElementById('popupInputCusName').focus();
+        return;
+    }
+    if (!phone) {
+        errorDiv.textContent = '⚠️ هاتف الزبون مطلوب';
+        errorDiv.style.display = 'block';
+        document.getElementById('popupInputCusPhone').focus();
+        return;
+    }
+    
+    errorDiv.style.display = 'none';
+    
+    // إنشاء معرف فريد
+    const id = 'CUS' + Date.now().toString(36) + Math.random().toString(36).substr(2, 4);
+    
+    const data = {
+        id: id,
+        CusID: cusID || '',
+        CUsName: name,
+        CusPhone: phone,
+        CUsLocation: location || '',
+        CusState: state,
+        CusPurchasheNO: 0,
+        CusPurchasheTotal: 0,
+        Timestamp: new Date().toISOString().split('T')[0]
+    };
+    
+    // تعطيل الزر أثناء الحفظ
+    const saveBtn = event ? event.target : document.querySelector('#popupCustomerAddRow .btn-success');
+    if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
+    }
+    
+    callCustomersScript('create', data)
+        .then(res => {
+            if (res.status === 'success') {
+                // تحديث قائمة الزبائن
+                return callCustomersScript('read');
+            } else {
+                throw new Error(res.message || 'خطأ في الإضافة');
+            }
+        })
+        .then(result => {
+            if (result.status === 'success') {
+                // تحديث البيانات المحلية
+                customersData = result.data.map(c => ({
+                    id: c.id || c.ID || '',
+                    name: c.CUsName || c.name || '',
+                    phone: c.CusPhone || c.phone || '',
+                    location: c.CUsLocation || c.location || '',
+                    status: c.CusState || c.status || 'عادي',
+                    purchaseCount: parseFloat(c.CusPurchasheNO) || 0,
+                    purchaseTotal: parseFloat(c.CusPurchasheTotal) || 0
+                }));
+                allCustomers = result.data || [];
+                isCustomersLoaded = true;
+                
+                // إعادة عرض قائمة الزبائن
+                renderPopupCustomers(customersData);
+                
+                // اختيار الزبون الجديد تلقائياً
+                const newCustomer = customersData.find(c => c.id === id);
+                if (newCustomer) {
+                    selectCustomer(newCustomer.id);
+                }
+                
+                // إخفاء صف الإدخال
+                hidePopupCustomerAddRow();
+                
+                // رسالة نجاح
+                showToast(`✅ تم إضافة الزبون "${name}" بنجاح`, 'success');
+            } else {
+                throw new Error(result.message || 'فشل تحديث القائمة');
+            }
+        })
+        .catch(err => {
+            errorDiv.textContent = '❌ ' + err.message;
+            errorDiv.style.display = 'block';
+            showToast('❌ فشل إضافة الزبون: ' + err.message, 'error');
+        })
+        .finally(() => {
+            // إعادة تمكين الزر
+            const btns = document.querySelectorAll('#popupCustomerAddRow .btn-success');
+            btns.forEach(btn => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save"></i> حفظ';
+            });
+        });
+}
+
+// السماح بحفظ الزبون بالضغط على Enter في الحقول
+document.addEventListener('DOMContentLoaded', function() {
+    const fields = ['popupInputCusID', 'popupInputCusName', 'popupInputCusPhone', 'popupInputCusLocation'];
+    fields.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    savePopupCustomer();
+                }
+            });
+        }
+    });
+});
 
    function renderPopupProducts(products) {
     const tbody = document.getElementById('popup-products-table-body');
