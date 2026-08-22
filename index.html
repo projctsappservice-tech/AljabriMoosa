@@ -9,7 +9,7 @@
     <!-- ===== Leaflet CSS ===== -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=7">
+<link rel="manifest" href="manifest.json?v=8">
 <meta name="theme-color" content="#0d6efd">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
@@ -854,12 +854,18 @@
         <div class="container">
             <!-- شريط التنقل -->
             <div class="app-navbar" id="appNavbar">
-                <div class="nav-brand"><i class="fas fa-store"></i><span>نظام السوبر ماركت</span></div>
-                <div class="nav-actions" id="navActions"></div>
-                <div class="user-badge"><i class="fas fa-user"></i><span id="navUserName">المستخدم</span>
-                <span id="connectionStatus" class="status-badge disconnected"><i class="fas fa-circle"></i> </span>
-                </div>
-            </div>
+    <div class="nav-brand"><i class="fas fa-store"></i><span>نظام السوبر ماركت</span></div>
+        <div class="user-badge">
+        <i class="fas fa-user"></i>
+        <span id="navUserName">المستخدم</span>
+        <button class="nav-btn logout-btn-nav" onclick="logout()" style="background:rgba(231, 76, 60, 0.3); border:1px solid rgba(231, 76, 60, 0.3); padding:4px 12px; border-radius:8px; color:white; cursor:pointer; font-size:0.75rem; display:flex; align-items:center; gap:4px; margin-right:10px;">
+            <i class="fas fa-sign-out-alt"></i> خروج
+        </button>
+        <span id="connectionStatus" class="status-badge disconnected"><i class="fas fa-circle"></i></span>
+    </div>
+    <div class="nav-actions" id="navActions"></div>
+
+</div>
             <!-- التبويبات -->
              <ul class="nav nav-tabs" id="mainTabs" role="tablist" style="display:none;">
                 <li class="nav-item"><a class="nav-link active" id="users-tab" data-bs-toggle="tab" href="#users" role="tab"><i class="fas fa-users me-1"></i>المستخدمين</a></li>
