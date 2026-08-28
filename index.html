@@ -9,7 +9,7 @@
     <!-- ===== Leaflet CSS ===== -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=9">
+<link rel="manifest" href="manifest.json?v=10">
 <meta name="theme-color" content="#0d6efd">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
@@ -2991,7 +2991,7 @@ function generateBarcode() {
 
 document.getElementById('printBarcodesBtn').addEventListener('click', function() {
     const productsToPrint = filteredProducts.length > 0 ? filteredProducts : allProducts;
-    
+
     if (!productsToPrint || productsToPrint.length === 0) {
         showToast('⚠️ لا توجد منتجات للطباعة', 'warning');
         return;
@@ -3003,8 +3003,20 @@ document.getElementById('printBarcodesBtn').addEventListener('click', function()
         return;
     }
 
-    // جلب اسم الشركة من بيانات الشركة (سطر واحد)
     const companyName = companyData.name || 'السوبر ماركت';
+    let companyNameLine1 = companyName;
+    let companyNameLine2 = '';
+    if (companyName.length > 15) {
+        const mid = Math.floor(companyName.length / 2);
+        const spaceIndex = companyName.indexOf(' ', mid);
+        if (spaceIndex > 0) {
+            companyNameLine1 = companyName.substring(0, spaceIndex);
+            companyNameLine2 = companyName.substring(spaceIndex + 1);
+        } else {
+            companyNameLine1 = companyName.substring(0, mid);
+            companyNameLine2 = companyName.substring(mid);
+        }
+    }
 
     let barcodesHtml = '';
     productsToPrint.forEach((product, index) => {
@@ -3012,267 +3024,132 @@ document.getElementById('printBarcodesBtn').addEventListener('click', function()
         const productName = product.ProdName || product.name || 'غير محدد';
         const price = parseFloat(product.ProdPrice || product.price || 0).toFixed(2);
 
-        // حجم الستيكر الأصلي (100mm × 55mm)
         barcodesHtml += `
-            <div class="barcode-sticker" data-index="${index}">
-                <div class="company-name">${companyName}</div>
-                <div class="barcode-wrapper">
-                    <svg id="barcode-svg-${index}" class="barcode-svg"></svg>
-                </div>
-                <div class="product-info">
-                    <span class="product-name">${productName}</span>
-                    <span class="product-price">${price} OR</span>
-                </div>
+        <div class="barcode-sticker" data-index="${index}" style="
+            width: 100mm;
+            height: 55mm;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 2px 8px;
+            margin: 4px auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            background: white;
+            page-break-after: avoid;
+            box-sizing: border-box;
+            font-family: 'Tahoma', 'Segoe UI', sans-serif;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        ">
+            <div style="width: 100%; display: flex; justify-content: center; align-items: center; margin: 0; padding: 0; line-height: 1;">
+                <span style="font-size: 15px; font-weight: bold; color: #333; white-space: nowrap; line-height: 1;">${companyNameLine1}${companyNameLine2 ? ' - ' + companyNameLine2 : ''}</span>
             </div>
-        `;
+            <div style="width: 100%; display: flex; justify-content: center; align-items: center; margin: 1px 0; padding: 0; overflow: hidden;">
+                <svg id="barcode-svg-${index}" style="width: 100%; height: 155px; display: block; margin: 0;"></svg>
+            </div>
+            <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; margin: 1px; padding: 0; line-height: 1;">
+                <span style="font-size: 14px; font-weight: bold; color: #333; line-height: 1;">${price} OR</span>
+                <span style="font-size: 13px; font-weight: bold; color: #333; line-height: 1;">${productName}</span>
+            </div>
+        </div>`;
     });
 
     printWindow.document.write(`
-        <!DOCTYPE html>
-        <html dir="rtl">
-        <head>
-            <meta charset="UTF-8">
-            <title>طباعة باركود المنتجات</title>
-            <style>
-                * {
-                    margin: 0;
-                    padding: 0;
-                    box-sizing: border-box;
-                }
-                
-                body {
-                    background: #f4f6f9;
-                    font-family: 'Tahoma', 'Segoe UI', sans-serif;
-                    padding: 20px;
-                    direction: rtl;
-                }
-                
-                .print-header {
-                    text-align: center;
-                    margin-bottom: 30px;
-                    padding-bottom: 15px;
-                    border-bottom: 2px solid #1e2a5a;
-                }
-                .print-header h3 {
-                    color: #1e2a5a;
-                    font-size: 22px;
-                    margin-bottom: 5px;
-                }
-                .print-header p {
-                    color: #666;
-                    font-size: 14px;
-                }
-                .print-header .count-badge {
-                    display: inline-block;
-                    background: #1e2a5a;
-                    color: white;
-                    padding: 4px 18px;
-                    border-radius: 20px;
-                    font-size: 14px;
-                    font-weight: bold;
-                }
-                .btn-print {
-                    padding: 10px 30px;
-                    background: #1e2a5a;
-                    color: white;
-                    border: none;
-                    border-radius: 10px;
-                    cursor: pointer;
-                    font-weight: bold;
-                    font-size: 16px;
-                    margin-top: 10px;
-                    transition: all 0.3s;
-                }
-                .btn-print:hover {
-                    background: #142045;
-                    transform: translateY(-2px);
-                    box-shadow: 0 5px 15px rgba(30,42,90,0.3);
-                }
-                
-                .barcode-grid {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fill, minmax(100mm, 1fr));
-                    gap: 15px;
-                    justify-content: center;
-                    max-width: 1200px;
-                    margin: 0 auto;
-                }
-                
-                /* ===== حجم الستيكر الأصلي ===== */
-                .barcode-sticker {
-                    width: 100mm;
-                    height: 55mm;
-                    margin: 0 auto;
-                    background: white;
-                    border: 1px solid #ddd;
-                    border-radius: 4px;
-                    padding: 6px 10px 4px 10px;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-                    page-break-inside: avoid;
-                    box-sizing: border-box;
-                    font-family: 'Tahoma', 'Segoe UI', sans-serif;
-                }
-                
-                .company-name {
-                    font-size: 14px;
-                    font-weight: bold;
-                    color: #1e2a5a;
-                    text-align: center;
-                    margin-bottom: 2px;
-                    line-height: 1.3;
-                    width: 100%;
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                }
-                
-                .barcode-wrapper {
-                    width: 100%;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    padding: 2px 0;
-                    flex: 1;
-                    background: white;
-                }
-                
-                .barcode-svg {
-                    width: 100%;
-                    height: 85px;
-                    display: block;
-                }
-                
-                .product-info {
-                    width: 100%;
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    padding-top: 3px;
-                    border-top: 1px solid #eee;
-                    margin-top: 2px;
-                    font-size: 13px;
-                    font-weight: bold;
-                    color: #333;
-                }
-                
-                .product-name {
-                    text-align: right;
-                    flex: 1;
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    padding-left: 5px;
-                }
-                
-                .product-price {
-                    text-align: left;
-                    white-space: nowrap;
-                    color: #1e2a5a;
-                }
-                
-                @media print {
-                    body {
-                        background: white;
-                        padding: 5px;
-                    }
-                    .no-print {
-                        display: none !important;
-                    }
-                    .barcode-sticker {
-                        border: 1px solid #aaa;
-                        box-shadow: none;
-                    }
-                    .barcode-grid {
-                        gap: 10px;
-                    }
-                    .print-header {
-                        margin-bottom: 15px;
-                    }
-                }
-                
-                /* ===== حجم الصفحة التلقائي ===== */
-                @page {
-                    size: auto;
-                    margin: 5mm;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="print-header no-print">
-                <h3><i class="fas fa-barcode"></i> باركود المنتجات</h3>
-                <p>
-                    <span class="count-badge">${productsToPrint.length} منتج</span>
-                    &nbsp;|&nbsp; تاريخ الطباعة: ${new Date().toLocaleString('ar-EG')}
-                </p>
-                <button class="btn-print" onclick="window.print()">
-                    <i class="fas fa-print"></i> طباعة الباركودات
-                </button>
-            </div>
-            
-            <div class="barcode-grid" id="barcodeGrid">
-                ${barcodesHtml}
-            </div>
-            
-            <div style="text-align:center; margin-top:20px; color:#999; font-size:11px;" class="no-print">
-                تم إنشاء بواسطة نظام السوبر ماركت
-            </div>
-            
-            <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"><\/script>
-            
-            <script>
-                const products = ${JSON.stringify(productsToPrint.map(p => ({
-                    name: p.ProdName || p.name || 'غير محدد',
-                    barcode: p.ProdBarcode || p.barcode || '',
-                    price: parseFloat(p.ProdPrice || p.price || 0)
-                })))};
-                
-                function generateBarcodes() {
-                    products.forEach((product, index) => {
-                        const svg = document.getElementById('barcode-svg-' + index);
-                        if (!svg) return;
-                        
-                        try {
-                            JsBarcode(svg, product.barcode || '0000000000000', {
-                                format: "CODE128",
-                                width: 2,
-                                height: 70,
-                                displayValue: true,
-                                fontSize: 14,
-                                font: "Arial",
-                                text: product.barcode || '0000000000000',
-                                textAlign: "center",
-                                textPosition: "bottom",
-                                textMargin: 3,
-                                margin: 0,
-                                background: "#ffffff",
-                                lineColor: "#000000"
-                            });
-                        } catch(e) {
-                            console.error('خطأ في توليد الباركود:', e);
-                            svg.innerHTML = '<text x="50%" y="50%" text-anchor="middle" font-size="12" fill="red">خطأ</text>';
-                        }
-                    });
-                }
+    <!DOCTYPE html>
+    <html dir="rtl">
+    <head>
+        <meta charset="UTF-8">
+        <title>طباعة باركود المنتجات</title>
+        <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { background: #f4f6f9; font-family: 'Tahoma', 'Segoe UI', sans-serif; padding: 15px; direction: rtl; }
+            .print-header { text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #1e2a5a; }
+            .print-header h3 { color: #1e2a5a; font-size: 20px; margin-bottom: 5px; }
+            .print-header p { color: #666; font-size: 13px; }
+            .print-header .count-badge { display: inline-block; background: #1e2a5a; color: white; padding: 4px 15px; border-radius: 20px; font-size: 14px; font-weight: bold; }
+            .barcode-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100mm, 1fr)); gap: 10px; justify-content: center; max-width: 1200px; margin: 0 auto; }
+            .barcode-sticker { width: 100mm; height: 55mm; border: 1px solid #ddd; border-radius: 4px; padding: 2px 8px; margin: 0 auto; display: flex; flex-direction: column; justify-content: flex-start; background: white; page-break-after: avoid; box-sizing: border-box; font-family: 'Tahoma', 'Segoe UI', sans-serif; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+            .barcode-sticker svg { width: 100%; height: 155px; display: block; margin: 0; }
+            .btn-print { padding: 10px 30px; background: #1e2a5a; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 10px; transition: all 0.3s; }
+            .btn-print:hover { background: #142045; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(30,42,90,0.3); }
+            @media print {
+                body { background: white; padding: 5px; }
+                .no-print { display: none; }
+                .barcode-sticker { border: 1px solid #aaa; box-shadow: none; margin: 2px auto; }
+                .barcode-grid { gap: 5px; }
+            }
+            @page { size: A4; margin: 8mm; }
+        </style>
+    </head>
+    <body>
+        <div class="print-header no-print">
+            <h3><i class="fas fa-barcode"></i> باركود المنتجات</h3>
+            <p>
+                <span class="count-badge">${productsToPrint.length} منتج</span>
+                &nbsp;|&nbsp;
+                تاريخ الطباعة: ${new Date().toLocaleString('ar-EG')}
+            </p>
+            <button class="btn-print" onclick="window.print()">
+                <i class="fas fa-print"></i> طباعة الباركودات
+            </button>
+        </div>
 
-                function waitForJsBarcode() {
-                    if (typeof JsBarcode !== 'undefined') {
-                        generateBarcodes();
-                    } else {
-                        setTimeout(waitForJsBarcode, 100);
+        <div class="barcode-grid" id="barcodeGrid">
+            ${barcodesHtml}
+        </div>
+
+        <div style="text-align:center; margin-top:20px; color:#999; font-size:11px;" class="no-print">
+            تم إنشاء بواسطة نظام السوبر ماركت
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"><\/script>
+        <script>
+            const products = ${JSON.stringify(productsToPrint.map(p => ({
+                name: p.ProdName || p.name || 'غير محدد',
+                barcode: p.ProdBarcode || p.barcode || '',
+                price: parseFloat(p.ProdPrice || p.price || 0)
+            })))};
+
+            function generateBarcodes() {
+                products.forEach((product, index) => {
+                    const svg = document.getElementById('barcode-svg-' + index);
+                    if (!svg) return;
+                    try {
+                        JsBarcode(svg, product.barcode || '0000000000000', {
+                            format: "CODE128",
+                            width: 2.4,
+                            height: 100,
+                            displayValue: true,
+                            fontSize: 15,
+                            font: "Arial",
+                            text: product.barcode || '0000000000000',
+                            textAlign: "center",
+                            textPosition: "bottom",
+                            textMargin: 3,
+                            margin: 0,
+                            background: "#ffffff",
+                            lineColor: "#000000"
+                        });
+                    } catch(e) {
+                        console.error('خطأ في توليد الباركود:', e);
+                        svg.innerHTML = '<text x="50%" y="50%" text-anchor="middle" font-size="12" fill="red">خطأ</text>';
                     }
+                });
+            }
+
+            function waitForJsBarcode() {
+                if (typeof JsBarcode !== 'undefined') {
+                    generateBarcodes();
+                } else {
+                    setTimeout(waitForJsBarcode, 100);
                 }
+            }
 
-                setTimeout(waitForJsBarcode, 300);
-
-                window.onbeforeprint = function() {
-                    setTimeout(generateBarcodes, 100);
-                };
-            <\/script>
-        </body>
-        </html>
+            setTimeout(waitForJsBarcode, 300);
+            window.onbeforeprint = function() { setTimeout(generateBarcodes, 100); };
+        <\/script>
+    </body>
+    </html>
     `);
     printWindow.document.close();
 });
@@ -3560,7 +3437,7 @@ function updateProductSummary(products) {
         updateProductFromRow(editingProductId);
         return;
     }
-
+    const vatValue = price * (vatPercent / 100);
     // إنشاء معرف فريد
     const productId = 'PRD' + Date.now().toString(36) + Math.random().toString(36).substr(2, 4);
 
