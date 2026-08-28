@@ -9,7 +9,7 @@
     <!-- ===== Leaflet CSS ===== -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=10">
+<link rel="manifest" href="manifest.json?v=11">
 <meta name="theme-color" content="#0d6efd">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
@@ -2997,7 +2997,7 @@ document.getElementById('printBarcodesBtn').addEventListener('click', function()
         return;
     }
 
-    const printWindow = window.open('', '_blank', 'width=800,height=600');
+    const printWindow = window.open('', '_blank', 'width=400,height=600');
     if (!printWindow) {
         showToast('⚠️ يرجى السماح بالنوافذ المنبثقة', 'warning');
         return;
@@ -3025,31 +3025,14 @@ document.getElementById('printBarcodesBtn').addEventListener('click', function()
         const price = parseFloat(product.ProdPrice || product.price || 0).toFixed(2);
 
         barcodesHtml += `
-        <div class="barcode-sticker" data-index="${index}" style="
-            width: 100mm;
-            height: 55mm;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 2px 8px;
-            margin: 4px auto;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            background: white;
-            page-break-after: avoid;
-            box-sizing: border-box;
-            font-family: 'Tahoma', 'Segoe UI', sans-serif;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-        ">
-            <div style="width: 100%; display: flex; justify-content: center; align-items: center; margin: 0; padding: 0; line-height: 1;">
-                <span style="font-size: 15px; font-weight: bold; color: #333; white-space: nowrap; line-height: 1;">${companyNameLine1}${companyNameLine2 ? ' - ' + companyNameLine2 : ''}</span>
+        <div class="barcode-sticker" data-index="${index}">
+            <div class="sticker-company">${companyNameLine1}${companyNameLine2 ? ' - ' + companyNameLine2 : ''}</div>
+            <div class="sticker-barcode-wrap">
+                <svg id="barcode-svg-${index}"></svg>
             </div>
-            <div style="width: 100%; display: flex; justify-content: center; align-items: center; margin: 1px 0; padding: 0; overflow: hidden;">
-                <svg id="barcode-svg-${index}" style="width: 100%; height: 155px; display: block; margin: 0;"></svg>
-            </div>
-            <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; margin: 1px; padding: 0; line-height: 1;">
-                <span style="font-size: 14px; font-weight: bold; color: #333; line-height: 1;">${price} OR</span>
-                <span style="font-size: 13px; font-weight: bold; color: #333; line-height: 1;">${productName}</span>
+            <div class="sticker-info">
+                <span class="sticker-price">${price} OR</span>
+                <span class="sticker-name">${productName}</span>
             </div>
         </div>`;
     });
@@ -3062,28 +3045,96 @@ document.getElementById('printBarcodesBtn').addEventListener('click', function()
         <title>طباعة باركود المنتجات</title>
         <style>
             * { margin: 0; padding: 0; box-sizing: border-box; }
-            body { background: #f4f6f9; font-family: 'Tahoma', 'Segoe UI', sans-serif; padding: 15px; direction: rtl; }
-            .print-header { text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #1e2a5a; }
-            .print-header h3 { color: #1e2a5a; font-size: 20px; margin-bottom: 5px; }
-            .print-header p { color: #666; font-size: 13px; }
-            .print-header .count-badge { display: inline-block; background: #1e2a5a; color: white; padding: 4px 15px; border-radius: 20px; font-size: 14px; font-weight: bold; }
-            .barcode-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100mm, 1fr)); gap: 10px; justify-content: center; max-width: 1200px; margin: 0 auto; }
-            .barcode-sticker { width: 100mm; height: 55mm; border: 1px solid #ddd; border-radius: 4px; padding: 2px 8px; margin: 0 auto; display: flex; flex-direction: column; justify-content: flex-start; background: white; page-break-after: avoid; box-sizing: border-box; font-family: 'Tahoma', 'Segoe UI', sans-serif; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
-            .barcode-sticker svg { width: 100%; height: 155px; display: block; margin: 0; }
-            .btn-print { padding: 10px 30px; background: #1e2a5a; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 10px; transition: all 0.3s; }
-            .btn-print:hover { background: #142045; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(30,42,90,0.3); }
-            @media print {
-                body { background: white; padding: 5px; }
-                .no-print { display: none; }
-                .barcode-sticker { border: 1px solid #aaa; box-shadow: none; margin: 2px auto; }
-                .barcode-grid { gap: 5px; }
+            body { background: #f4f6f9; font-family: 'Tahoma', 'Segoe UI', sans-serif; padding: 10px; direction: rtl; }
+            .print-header { text-align: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #1e2a5a; }
+            .print-header h3 { color: #1e2a5a; font-size: 16px; margin-bottom: 5px; }
+            .print-header p { color: #666; font-size: 11px; }
+            .print-header .count-badge { display: inline-block; background: #1e2a5a; color: white; padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+
+            /* عمود واحد بعرض 58mm يناسب الطابعة الحرارية */
+            .barcode-grid { display: flex; flex-direction: column; align-items: center; gap: 3mm; }
+
+            .barcode-sticker {
+                width: 58mm;
+                min-height: 30mm;
+                border: 1px dashed #ccc;
+                padding: 2mm 1mm;
+                background: white;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: flex-start;
+                page-break-after: always;
+                box-sizing: border-box;
+                font-family: 'Tahoma', 'Segoe UI', sans-serif;
             }
-            @page { size: A4; margin: 8mm; }
+
+            .sticker-company {
+                font-size: 11px;
+                font-weight: bold;
+                color: #333;
+                text-align: center;
+                width: 100%;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                line-height: 1.2;
+            }
+
+            .sticker-barcode-wrap {
+                width: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin: 1mm 0;
+            }
+
+            .sticker-barcode-wrap svg {
+                width: 100%;
+                max-width: 54mm;
+                height: auto;
+                display: block;
+            }
+
+            .sticker-info {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0 1mm;
+            }
+
+            .sticker-price { font-size: 11px; font-weight: bold; color: #333; }
+            .sticker-name {
+                font-size: 10px;
+                font-weight: bold;
+                color: #333;
+                max-width: 34mm;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .btn-print { padding: 8px 24px; background: #1e2a5a; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; margin-top: 8px; }
+            .btn-print:hover { background: #142045; }
+
+            @media print {
+                body { background: white; padding: 0; }
+                .no-print { display: none; }
+                .barcode-sticker { border: none; margin: 0 auto; page-break-after: always; }
+                .barcode-grid { gap: 0; }
+            }
+
+            /* تنسيق ورق الطابعة الحرارية 58mm - عرض ثابت وطول تلقائي */
+            @page {
+                size: 58mm auto;
+                margin: 0;
+            }
         </style>
     </head>
     <body>
         <div class="print-header no-print">
-            <h3><i class="fas fa-barcode"></i> باركود المنتجات</h3>
+            <h3><i class="fas fa-barcode"></i> باركود المنتجات (58mm)</h3>
             <p>
                 <span class="count-badge">${productsToPrint.length} منتج</span>
                 &nbsp;|&nbsp;
@@ -3098,7 +3149,7 @@ document.getElementById('printBarcodesBtn').addEventListener('click', function()
             ${barcodesHtml}
         </div>
 
-        <div style="text-align:center; margin-top:20px; color:#999; font-size:11px;" class="no-print">
+        <div style="text-align:center; margin-top:15px; color:#999; font-size:10px;" class="no-print">
             تم إنشاء بواسطة نظام السوبر ماركت
         </div>
 
@@ -3117,22 +3168,22 @@ document.getElementById('printBarcodesBtn').addEventListener('click', function()
                     try {
                         JsBarcode(svg, product.barcode || '0000000000000', {
                             format: "CODE128",
-                            width: 2.4,
-                            height: 100,
+                            width: 1.6,
+                            height: 55,
                             displayValue: true,
-                            fontSize: 15,
+                            fontSize: 11,
                             font: "Arial",
                             text: product.barcode || '0000000000000',
                             textAlign: "center",
                             textPosition: "bottom",
-                            textMargin: 3,
+                            textMargin: 2,
                             margin: 0,
                             background: "#ffffff",
                             lineColor: "#000000"
                         });
                     } catch(e) {
                         console.error('خطأ في توليد الباركود:', e);
-                        svg.innerHTML = '<text x="50%" y="50%" text-anchor="middle" font-size="12" fill="red">خطأ</text>';
+                        svg.innerHTML = '<text x="50%" y="50%" text-anchor="middle" font-size="10" fill="red">خطأ</text>';
                     }
                 });
             }
