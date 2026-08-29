@@ -9,7 +9,7 @@
     <!-- ===== Leaflet CSS ===== -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=12">
+<link rel="manifest" href="manifest.json?v=13">
 <meta name="theme-color" content="#0d6efd">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
@@ -3127,7 +3127,7 @@ document.getElementById('printBarcodesBtn').addEventListener('click', function()
 
             /* تنسيق ورق الطابعة الحرارية 58mm - عرض ثابت وطول تلقائي */
             @page {
-                size: 58mm auto;
+               size: 58mm 40mm;
                 margin: 0;
             }
         </style>
