@@ -9,7 +9,7 @@
     <!-- ===== Leaflet CSS ===== -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=14">
+<link rel="manifest" href="manifest.json?v=15">
 <meta name="theme-color" content="#0d6efd">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
@@ -1366,7 +1366,7 @@
                     <div class="table-responsive" style="overflow-x:auto; max-height:400px; overflow-y:auto; margin:15px 0;">
                         <table id="popup-products-table" style="width:100%; min-width:600px; display:table; border-collapse:collapse; background:white;">
                             <thead>
-                                <tr><th>#</th><th>الباركود</th><th>القسم</th><th>المنتج</th><th>سعر الشراء</th><th>الضريبة</th><th>سعر البيع</th><th>المخزون</th><th>إضافة</th></tr>
+                                <tr><th>#</th><th>الباركود</th><th>القسم</th><th>المنتج</th><th>الضريبة</th><th>السعر</th><th>المخزون</th><th>إضافة</th></tr>
                             </thead>
                             <tbody id="popup-products-table-body"></tbody>
                         </table>
@@ -2034,7 +2034,7 @@
         // روابط السكربتات المنفصلة
         // ===================================================================
         
-             const PRODUCTS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyLmMPJcRIzGcgPcpi7xfX-AEixyqvXiRotCchppY2leDv92db9rfVkHOcp2Gs58SK9/exec';
+        const PRODUCTS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxw2bXCjDoPXWc5L4JHZ71G2deztfrPIg8QCycdWUmY5_saCC9IR6LEso-piS7eyF2c/exec';
        const PRODUCT_SHEET_ID = '16mzoKiUGrZXHJ1l7RY2wjiKyF3eu1RGx1gU0FxfmTMg';
         const PRODUCT_SHEET_NAME = 'Products';
         const CUSTOMERS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzeqhudPgRe4_OZFjQQXByurqyctQRWGlcFJ2HU2yDLIBAwgzN9-Fp_FnuMho7QP2a3/exec';
@@ -2042,7 +2042,7 @@
        const USERS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyK4j--1pg9TxAkaTKWTZ1_xgi1gbPsN7h9d-BuzAgiXY8Kv65vX_eYWag-N1DyF_-b/exec';
        const SUPBILL_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwdBzcGLNuHkFOrj-J4JZ9kL9VMTm9Mb9p9zHBTtjGkMrikwFYHsEDAg3nG1_FvPB9qKw/exec'; // <-- رابط سكربت الموردي
        const COMPANY_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwqttdDnHpSklFkcBkgonU4kqEYnK2aefCEqUUiYaz_nMe7IKf_wT4R1MNDMyMAnr8abA/exec';
-         const ADD_TRASH_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx7280n_hBQ7YfyIfCoQQR-vebJxgg7KMvnzVef3fOhWGZYmwAY3qQNilNncbvAnreIZA/exec'; // ضع رابط السكربت هنا
+        const ADD_TRASH_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx7280n_hBQ7YfyIfCoQQR-vebJxgg7KMvnzVef3fOhWGZYmwAY3qQNilNncbvAnreIZA/exec'; // ضع رابط السكربت هنا
         
        let SPLASH_LOGO_URL = 'https://via.placeholder.com/200/1e2a5a/ffffff?text=Logo';
         let LOGIN_LOGO_URL = 'https://via.placeholder.com/120/1e2a5a/ffffff?text=Logo';
@@ -2760,6 +2760,7 @@ function togglePasswordVisibilityRow(btn, password) {
     .then(result => {
         if (result.status === 'success' && result.data) {
             allProducts = result.data || [];
+            allProducts.reverse();
             productsData = allProducts.map(p => ({
                 id: p.id || p.ProductID,
                 barcode: p.ProdBarcode || '',
@@ -2852,7 +2853,7 @@ function togglePasswordVisibilityRow(btn, password) {
     updateProductSummary(filteredProducts);
 }
 
-    function renderProductsTable(products) {
+   function renderProductsTable(products) {
     const tbody = document.getElementById('productsTableBody');
     tbody.innerHTML = '';
     
@@ -2877,10 +2878,10 @@ function togglePasswordVisibilityRow(btn, password) {
         </button>
     </div>
         <td><input type="text" id="inputName" class="form-control form-control-sm" placeholder="اسم المنتج" /></td>
-        <td><span class="text-muted small">تلقائي</span></td>
-       <td><input type="number" id="inputLastAdd" class="form-control form-control-sm" placeholder="0" value="0" step="1" min="0" style="background:#f8f9fa;" /></td>
-        <td><span class="text-muted small">تلقائي</span></td>
-        <td><span class="text-muted small">0</span></td>
+        <td><input type="text" id="inputAvailable" class="form-control form-control-sm" readonly style="background:#f8f9fa;" value="تلقائي" /></td>
+        <td><input type="number" id="inputLastAdd" class="form-control form-control-sm" placeholder="0" value="0" step="1" min="0" style="background:#f8f9fa;" /></td>
+        <td><input type="text" id="inputStock" class="form-control form-control-sm" readonly style="background:#f8f9fa;" value="تلقائي" /></td>
+        <td><input type="text" id="inputSpent" class="form-control form-control-sm" readonly style="background:#f8f9fa;" value="0" /></td>
         <td><input type="number" id="inputPrice" class="form-control form-control-sm" placeholder="0.00" value="0" step="0.01" /></td>
         <td><input type="number" id="inputVat" class="form-control form-control-sm" placeholder="0" value="0" step="0.01" /></td>
         <td><span class="text-muted small">حساب تلقائي</span></td>
@@ -3060,7 +3061,7 @@ document.getElementById('printBarcodesBtn').addEventListener('click', function()
             }
 
             .sticker-company {
-                font-size: 7px;
+                font-size: 8px;
                 font-weight: bold;
                 color: #333;
                 text-align: center;
@@ -3548,26 +3549,28 @@ function updateProductSummary(products) {
     
     editingProductId = id;
     
-    // تعبئة الحقول
     document.getElementById('inputSupplier').value = product.ProdSupplier || '';
     document.getElementById('inputSection').value = product.ProdSection || '';
     document.getElementById('inputBarcode').value = product.ProdBarcode || '';
     document.getElementById('inputName').value = product.ProdName || '';
-    document.getElementById('inputLastAdd').value = product.ProdLastAdd || 0; // تعيين آخر إضافة
+
+    // ===== تعبئة القيم الحقيقية بدل النصوص الافتراضية =====
+    document.getElementById('inputAvailable').value = parseFloat(product.ProdAvailable) || 0;
+    document.getElementById('inputLastAdd').value = parseFloat(product.ProdLastAdd) || 0;
+    document.getElementById('inputStock').value = parseFloat(product.ProdStock) || 0;
+    document.getElementById('inputSpent').value = parseFloat(product.ProdSpent) || 0;
+
     document.getElementById('inputPrice').value = product.ProdPrice || 0;
     document.getElementById('inputVat').value = product['ProdVat%'] || 0;
     
-    // تغيير زر الإضافة إلى تحديث
     const addBtn = document.getElementById('addProductBtn');
     addBtn.innerHTML = '<i class="fas fa-edit"></i> تحديث';
     addBtn.className = 'btn btn-warning btn-sm w-100';
     
-    // إظهار زر إلغاء التعديل
     document.getElementById('cancelProductEditBtn').style.display = 'inline-block';
     document.getElementById('productFormStatus').style.display = 'block';
     document.getElementById('productFormStatusText').textContent = `جاري تعديل: ${product.ProdName}`;
     
-    // تمييز الصف
     document.getElementById('productInputRow').classList.add('edit-mode');
     document.querySelectorAll('#productsTableBody tr').forEach(row => {
         if (row.dataset.id && String(row.dataset.id) === String(id)) {
@@ -3577,65 +3580,42 @@ function updateProductSummary(products) {
         }
     });
     
-    // جعل حقل آخر إضافة للقراءة فقط (لأنه يعكس آخر كمية مضافة، ولا يجب تعديله يدوياً)
+    // آخر إضافة تبقى للقراءة فقط أثناء التعديل (كما كان)
     document.getElementById('inputLastAdd').readOnly = true;
     document.getElementById('inputLastAdd').style.background = '#f8f9fa';
 }
 
-  function updateProductFromRow(id) {
+function updateProductFromRow(id) {
     const supplier = document.getElementById('inputSupplier').value.trim();
     const section = document.getElementById('inputSection').value.trim();
     const barcode = document.getElementById('inputBarcode').value.trim();
     const name = document.getElementById('inputName').value.trim();
-    const lastAdd = parseFloat(document.getElementById('inputLastAdd').value) || 0;
     const price = parseFloat(document.getElementById('inputPrice').value) || 0;
     const vatPercent = parseFloat(document.getElementById('inputVat').value) || 0;
+
+    // ===== قراءة القيم الحقيقية من صف الإدخال بدل تصفيرها =====
+    const available = parseFloat(document.getElementById('inputAvailable').value) || 0;
+    const lastAdd = parseFloat(document.getElementById('inputLastAdd').value) || 0;
+    const stock = parseFloat(document.getElementById('inputStock').value) || 0;
+    const spent = parseFloat(document.getElementById('inputSpent').value) || 0;
 
     if (!name) {
         alert('اسم المنتج مطلوب');
         return;
     }
 
-    // الحصول على القيم الحالية من allProducts
-    const currentProduct = allProducts.find(p => String(p.id) === String(id));
-    if (!currentProduct) {
-        alert('المنتج غير موجود');
-        return;
-    }
-
-    const currentAvailable = parseFloat(currentProduct.ProdAvailable) || 0;
-    const currentStock = parseFloat(currentProduct.ProdStock) || 0;
-    const currentSpent = parseFloat(currentProduct.ProdSpent) || 0;
-    const currentLastAdd = parseFloat(currentProduct.ProdLastAdd) || 0;
-    const currentTotalSales = parseFloat(currentProduct.ProdTotalSales) || 0;
-    const currentSales = parseFloat(currentProduct.ProdSales) || 0;
-    const currentBenefits = parseFloat(currentProduct.ProdBenefits) || 0;
-
-    // حساب القيم الجديدة
-    const newAvailable = currentAvailable + lastAdd;
-    const newStock = currentStock + lastAdd;
-    const totalPrice = price + (price * (vatPercent / 100));
-    const newTotalSales = currentSpent * totalPrice;
-    const newSales = newStock * totalPrice;
-    const newBenefits = newTotalSales - newSales;
-
-    // بناء كائن التحديث
-  const updateData = {
-        ...currentProduct,
+    const updateData = {
+        id: id,
         ProdSupplier: supplier,
         ProdSection: section,
         ProdBarcode: barcode,
         ProdName: name,
-        ProdLastAdd: lastAdd,
         ProdPrice: price,
         'ProdVat%': vatPercent,
-        ProdVatP: price * (vatPercent / 100),
-        ProdAvailable: newAvailable,
-        ProdStock: newStock,
-        ProdSpent: currentSpent,
-        ProdTotalSales: newTotalSales,
-        ProdSales: newSales,
-        ProdBenefits: newBenefits
+        ProdAvailable: available,
+        ProdLastAdd: lastAdd,
+        ProdStock: stock,
+        ProdSpent: spent
     };
 
     showLoading();
@@ -3645,7 +3625,7 @@ function updateProductSummary(products) {
                 cancelProductEdit();
                 loadProducts();
                 hideLoading();
-                showNotification('✅ تم تحديث المنتج بنجاح', 'success');
+                showNotification('✅ تم تحديث بيانات المنتج بنجاح', 'success');
             } else {
                 throw new Error(res.message || 'خطأ في التحديث');
             }
@@ -3656,49 +3636,57 @@ function updateProductSummary(products) {
         });
 }
 
-        function cancelProductEdit() {
+
+  function cancelProductEdit() {
     editingProductId = null;
     clearProductInputRow();
     document.getElementById('cancelProductEditBtn').style.display = 'none';
     document.getElementById('productFormStatus').style.display = 'none';
     document.getElementById('productInputRow').classList.remove('edit-mode');
-    document.querySelectorAll('#productsTableBody tr').forEach(row => { row.style.backgroundColor = '';});
-    // جعل حقل آخر إضافة قابل للتعديل مجدداً
-    document.getElementById('inputLastAdd').readOnly = false;
-    document.getElementById('inputLastAdd').style.background = 'white';
+    document.querySelectorAll('#productsTableBody tr').forEach(row => { row.style.backgroundColor = ''; });
+   
 }
 
-       function clearProductInputRow() {
+    function clearProductInputRow() {
     document.getElementById('inputSupplier').value = '';
     document.getElementById('inputSection').value = '';
     document.getElementById('inputBarcode').value = '';
     document.getElementById('inputName').value = '';
+
+    // ===== إعادة النصوص الافتراضية عند وضع "إضافة جديد" =====
+    document.getElementById('inputAvailable').value = 'تلقائي';
     document.getElementById('inputLastAdd').value = 0;
+    document.getElementById('inputStock').value = 'تلقائي';
+    document.getElementById('inputSpent').value = '0';
+
     document.getElementById('inputPrice').value = 0;
     document.getElementById('inputVat').value = 0;
     
-    // إعادة زر الإضافة
     const addBtn = document.getElementById('addProductBtn');
     addBtn.innerHTML = '<i class="fas fa-plus"></i> إضافة';
     addBtn.className = 'btn btn-primary btn-sm w-100';
     
-    // جعل حقل آخر إضافة قابل للتعديل (عند الإضافة الجديدة)
     document.getElementById('inputLastAdd').readOnly = false;
     document.getElementById('inputLastAdd').style.background = 'white';
 }
 
-        function deleteProduct(id) {
-            if (!confirm('هل أنت متأكد من حذف هذا المنتج؟')) return;
-            callProductsScript('delete', { id: id })
-                .then(res => {
-                    if (res.status === 'success') {
-                        if (editingProductId === id) cancelProductEdit();
-                        loadProducts();
-                        alert('تم حذف المنتج');
-                    } else throw new Error(res.message);
-                })
-                .catch(err => alert(err.message));
-        }
+       function deleteProduct(id) {
+    if (!confirm('هل أنت متأكد من حذف هذا المنتج؟')) return;
+    showLoading();
+    callProductsScript('delete', { id: id })
+        .then(res => {
+            if (res.status === 'success') {
+                if (editingProductId === id) cancelProductEdit();
+                loadProducts();
+                hideLoading();
+                showNotification('✅ تم حذف المنتج بنجاح', 'success');
+            } else throw new Error(res.message);
+        })
+        .catch(err => {
+            hideLoading();
+            alert(err.message);
+        });
+}
 
         // ======================== أحداث المنتجات ========================
         document.getElementById('searchProductInput').addEventListener('input', applyProductFilters);
@@ -3711,7 +3699,7 @@ function updateProductSummary(products) {
             document.getElementById('filterSupplier').value = '';
             applyProductFilters();
         });
-
+        document.getElementById('cancelProductEditBtn').addEventListener('click', cancelProductEdit);
         document.getElementById('loadProductsBtn').addEventListener('click', function() {
             if (editingProductId) cancelProductEdit();
             loadProducts();
@@ -5966,11 +5954,11 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-   function renderPopupProducts(products) {
+  function renderPopupProducts(products) {
     const tbody = document.getElementById('popup-products-table-body');
     if (!tbody) return;
     if (!products || products.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:20px;">🚫 لا توجد نتائج</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:20px;">🚫 لا توجد نتائج</td></tr>`;
         return;
     }
     tbody.innerHTML = '';
@@ -5984,7 +5972,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 <td style="padding:8px;text-align:center;">${p.barcode || '-'}</td>
                 <td style="padding:8px;text-align:center;">${p.section || '-'}</td>
                 <td style="padding:8px;text-align:center;font-weight:bold;">${p.name}</td>
-                <td style="padding:8px;text-align:center;color:#007bff;">${parseFloat(p.purchasePrice || 0).toFixed(3)}</td>
                 <td style="padding:8px;text-align:center;color:#28a745;">${parseFloat(vatAmount).toFixed(3)}</td>
                 <td style="padding:8px;text-align:center;color:#17a2b8;">${parseFloat(sellPrice).toFixed(3)}</td>
                 <td style="padding:8px;text-align:center;font-weight:bold;color:${p.stock <= 0 ? 'red' : 'green'};">${p.stock}</td>
