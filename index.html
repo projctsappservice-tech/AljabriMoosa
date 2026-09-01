@@ -9,7 +9,7 @@
     <!-- ===== Leaflet CSS ===== -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=15">
+<link rel="manifest" href="manifest.json?v=16">
 <meta name="theme-color" content="#0d6efd">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
@@ -982,7 +982,7 @@
                                 </div>
                                 <div class="filter-group">
                                     <button class="btn btn-sm btn-outline-secondary" id="clearProductFiltersBtn"><i class="fas fa-times"></i> مسح</button>
-                                <button class="btn btn-outline-success btn-sm" id="printBarcodesBtn" title="طباعة باركود المنتجات المفلترة">
+                                <button class="btn btn-outline-success btn-sm" id="" title="طباعة باركود المنتجات المفلترة">
     <i class="fas fa-print me-1"></i>طباعة الباركود
 </button>
                                 </div>
@@ -3021,7 +3021,7 @@ document.getElementById('printBarcodesBtn').addEventListener('click', function()
      <div class="sticker-number-row">
     <span class="sticker-barcode-number">${barcodeValue}</span>
     <span class="sticker-dash">-</span>
-    <span class="sticker-price">${price} OR</span>
+    <span class="sticker-price">${price}OR</span>
 </div>
             <div class="sticker-name">${productName}</div>
         </div>`;
@@ -3061,15 +3061,17 @@ document.getElementById('printBarcodesBtn').addEventListener('click', function()
             }
 
             .sticker-company {
-                font-size: 8px;
+                font-size: 10px;
                 font-weight: bold;
                 color: #333;
                 text-align: center;
                 width: 100%;
-                white-space: nowrap;
+                white-space: wrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
-                line-height: 1.1;
+                line-height: 1;
+                position: relative;
+                top: 1mm;
             }
 
             /* الباركود (الرسم فقط بدون رقم) ياخذ العرض كامل */
@@ -3099,39 +3101,51 @@ document.getElementById('printBarcodesBtn').addEventListener('click', function()
     justify-content: center;
     align-items: center;
     padding: 0 0.5mm;
-    gap: 1.2mm;
+    gap: 0.5mm;
+ 
 }
 
 .sticker-dash {
-    font-size: 7px;
+    font-size: 10px;
     color: #333;
     font-weight: bold;
+    gap: 0.5mm;
+     position: relative;
+    bottom: 1mm;
 }
             .sticker-barcode-number {
-                font-size: 7px;
+                font-size: 10px;
+                font-weight: bold;
                 color: #333;
                 white-space: nowrap;
                 letter-spacing: 0.3px;
                 direction: ltr;
+                 position: relative;
+                bottom: 1mm;
             }
 
             .sticker-price {
-                font-size: 8px;
+                font-size: 10px;
                 font-weight: bold;
                 color: #333;
                 white-space: nowrap;
                 flex-shrink: 0;
+                 position: relative;
+                bottom: 1mm;
+                
             }
 
             .sticker-name {
-                font-size: 7px;
+                font-size: 10px;
                 font-weight: bold;
                 color: #333;
                 width: 100%;
                 text-align: center;
                 overflow: hidden;
                 text-overflow: ellipsis;
-                white-space: nowrap;
+                white-space: wrap;
+                 position: relative;
+    bottom: 1mm;
             }
 
             .btn-print { padding: 8px 24px; background: #1e2a5a; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; margin-top: 8px; }
