@@ -9,7 +9,7 @@
     <!-- ===== Leaflet CSS ===== -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=18">
+<link rel="manifest" href="manifest.json?v=19">
 <meta name="theme-color" content="#0d6efd">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
@@ -2333,6 +2333,7 @@ function openWindow(windowId) {
                     document.getElementById('loginScreen').classList.remove('show');
                     document.getElementById('welcomeScreen').classList.add('show');
                     document.getElementById('welcomeUserName').textContent = currentUser.name || 'مستخدم';
+                    document.getElementById('cashier-name').textContent = currentUser.name || 'مستخدم';
                     renderWelcomeCards();
                     loginLoading.classList.remove('show');
                     loginBtn.disabled = false;
