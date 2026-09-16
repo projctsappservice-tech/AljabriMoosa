@@ -9,7 +9,7 @@
     <!-- ===== Leaflet CSS ===== -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=19">
+<link rel="manifest" href="manifest.json?v=20">
 <meta name="theme-color" content="#0d6efd">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
@@ -1231,17 +1231,17 @@
         </div>
         
         <!-- الإجمالي مع التوصيل -->
-        <div class="summary-item" style="display:flex; align-items:center; justify-content:space-between; background:white; padding:6px 12px; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.1); gap:8px; min-height:40px;">
+        <div class="summary-item" style="display:flex; align-items:center; justify-content:space-between; background:rgb(170, 229, 252); padding:6px 12px; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.1); gap:8px; min-height:40px;">
             <label style="font-weight:600; font-size:0.85rem; color:#495057; white-space:nowrap;"><i class="fas fa-receipt"></i> الإجمالي مع التوصيل:</label>
             <input type="text" id="total-with-delivery" readonly value="0.000" style="flex:1; min-width:60px; max-width:100px; text-align:center; border:1px solid #dee2e6; border-radius:6px; background:#f8f9fa; font-weight:bold; font-size:0.9rem; padding:5px 6px;">
         </div>
         <!-- المدفوع -->
-        <div class="summary-item" style="display:flex; align-items:center; justify-content:space-between; background:white; padding:6px 12px; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.1); gap:8px; min-height:40px;">
+        <div class="summary-item" style="display:flex; align-items:center; justify-content:space-between; background:rgb(153, 243, 205); padding:6px 12px; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.1); gap:8px; min-height:40px;">
             <label style="font-weight:600; font-size:0.85rem; color:#495057; white-space:nowrap;"><i class="fas fa-money-bill"></i> المدفوع (Ctrl+1):</label>
             <input type="number" id="paid-amount" value="0.000" step="0.001" oninput="calculateRemaining()" style="flex:1; min-width:60px; max-width:100px; text-align:center; border:1px solid #dee2e6; border-radius:6px; background:white; font-weight:bold; font-size:0.9rem; padding:5px 6px;">
         </div>
         <!-- الباقي -->
-        <div class="summary-item" style="display:flex; align-items:center; justify-content:space-between; background:white; padding:6px 12px; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.1); gap:8px; min-height:40px;">
+        <div class="summary-item" style="display:flex; align-items:center; justify-content:space-between; background:rgb(250, 163, 163); padding:6px 12px; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.1); gap:8px; min-height:40px;">
             <label style="font-weight:600; font-size:0.85rem; color:#495057; white-space:nowrap;">الباقي:</label>
             <input type="text" id="remaining-amount" readonly value="0.000" style="flex:1; min-width:60px; max-width:100px; text-align:center; border:1px solid #dee2e6; border-radius:6px; background:#f8f9fa; font-weight:bold; font-size:0.9rem; padding:5px 6px;">
         </div>
@@ -4407,7 +4407,7 @@ async function fetchCustomers() {
     }
 }
 
-             async function addToCart(product, qty = 1) {
+    async function addToCart(product, qty = 1) {
     const existing = cartItems.find(i => i.id === product.id);
     const currentQty = existing ? existing.qty : 0;
     const available = product.stock - currentQty;
@@ -4451,6 +4451,7 @@ async function fetchCustomers() {
     }
     renderCart();
     updateTotalWithDelivery();
+    focusBarcodeInput();
     return true;
 }
 
@@ -4484,7 +4485,12 @@ async function fetchCustomers() {
                         });
                     }
 
-                    function removeFromCart(index) { cartItems.splice(index, 1); renderCart(); updateTotalWithDelivery(); }
+                   function removeFromCart(index) { 
+    cartItems.splice(index, 1); 
+    renderCart(); 
+    updateTotalWithDelivery(); 
+    focusBarcodeInput(); // ✅
+}
 
                  function updateCartQty(index, newQty) {
     newQty = parseInt(newQty);
@@ -4501,6 +4507,7 @@ async function fetchCustomers() {
     
     renderCart();
     updateTotalWithDelivery();
+    focusBarcodeInput();
 }
 
                     function searchPopupProducts() {
@@ -6000,23 +6007,66 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 }
 
-                    document.getElementById('barcode-reader').addEventListener('keypress', function(e) {
-                        if (e.key === 'Enter') {
-                            const barcode = this.value.trim();
-                            if (!barcode) return;
-                            const product = productsData.find(p => p.barcode === barcode);
-                            if (!product) { showToast('❌ الباركود غير موجود', 'error'); this.value = ''; return; }
-                            const added = addToCart(product, 1);
-                            if (added) { this.value = ''; } else { this.select(); }
-                        }
-                    });
+// ============================================================
+// دالة إعادة التركيز إلى حقل الباركود في نافذة الكاشير
+// ============================================================
+function focusBarcodeInput() {
+    // التأكد من أن نافذة الكاشير مرئية حالياً
+    const cashierPane = document.getElementById('cashier');
+    if (!cashierPane || !cashierPane.classList.contains('active')) return;
+    
+    // عدم سرقة التركيز إذا كانت هناك نافذة منبثقة مفتوحة
+    const popups = [
+        'products-popup', 'customers-popup', 'scannerModal',
+        'lastInvoiceModal', 'addTrashModal', 'billViewModal',
+        'qrZoomModal', 'companyModal', 'confirmDialog',
+        'paidReceiptModal', 'paymentConfirmDialog'
+    ];
+    for (const id of popups) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        const st = window.getComputedStyle(el);
+        if (st.display === 'flex' || st.display === 'block') return;
+        if (el.classList.contains('show')) return;
+    }
+    
+    const input = document.getElementById('barcode-reader');
+    if (input && document.activeElement !== input) {
+        // تأخير بسيط لضمان انتهاء أي إعادة رسم
+        setTimeout(() => input.focus(), 0);
+    }
+}
 
-                    window.addToCartFromPopup = async function(id, qty) {
-                        const product = productsData.find(p => p.id == id);
-                        if (!product) { showToast('المنتج غير موجود', 'error'); return; }
-                        const added = await addToCart(product, qty);
-                        if (added) { closeProductsPopup(); }
-                    };
+     document.getElementById('barcode-reader').addEventListener('keydown', async function(e) {
+    if (e.key === 'Enter' || e.keyCode === 13) {
+        e.preventDefault();
+        const barcode = this.value.trim();
+        if (!barcode) { this.focus(); return; }
+        
+        const product = productsData.find(p => String(p.barcode || '').trim() === barcode);
+        if (!product) {
+            showToast('❌ الباركود غير موجود', 'error');
+            this.value = '';
+            this.focus();
+            return;
+        }
+        
+        await addToCart(product, 1);
+        // إعادة التركيز إلى الحقل بعد الإضافة
+        this.value = '';
+        this.focus();
+    }
+});
+
+     window.addToCartFromPopup = async function(id, qty) {
+    const product = productsData.find(p => p.id == id);
+    if (!product) { showToast('المنتج غير موجود', 'error'); return; }
+    const added = await addToCart(product, qty);
+    if (added) { 
+        closeProductsPopup(); 
+        focusBarcodeInput(); // ✅ إعادة التركيز بعد الإغلاق
+    }
+};
 
                     document.addEventListener('keydown', function(e) {
                         if (e.repeat) return;
