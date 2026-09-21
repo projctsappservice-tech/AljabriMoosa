@@ -9,13 +9,13 @@
     <!-- ===== Leaflet CSS ===== -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=20">
+<link rel="manifest" href="manifest.json?v=21">
 <meta name="theme-color" content="#0d6efd">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="إدارة النقود">
+<meta name="apple-mobile-web-app-title" content="إدارة المنتجات">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.rtl.min.css" rel="stylesheet" />
@@ -1202,8 +1202,8 @@
                         <tbody id="cart-items-body" ></tbody>
                     </table>
                 </div>
-              <div class="summary" style="background:#e8f0f8; border-radius:12px; padding:15px; margin-top:-20px;">
-    <div class="summary-grid" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:12px; margin-top:-10px; margin-bottom:-10px;">
+              <div class="summary" style="background:#e8f0f8; border-radius:12px; padding:15px; margin-top:-20px; flex-wrap: wrap;">
+    <div class="summary-grid" style="display:grid; grid-template-columns: repeat(5, 1fr); gap:12px; margin-top:-10px; margin-bottom:-10px;">
         <!-- الكمية -->
         <div class="summary-item" style="display:flex; align-items:center; justify-content:space-between; background:white; padding:6px 12px; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.1); gap:8px; min-height:40px;">
             <label style="font-weight:600; font-size:0.85rem; color:#495057; white-space:nowrap;"><i class="fas fa-boxes"></i> الكمية:</label>
@@ -1224,6 +1224,18 @@
             <label style="font-weight:600; font-size:0.85rem; color:#495057; white-space:nowrap;"><i class="fas fa-chart-line"></i> المجموع+الضريبة:</label>
             <input type="text" id="total-sum" readonly value="0.000" style="flex:1; min-width:60px; max-width:100px; text-align:center; border:1px solid #dee2e6; border-radius:6px; background:#f8f9fa; font-weight:bold; font-size:0.9rem; padding:5px 6px;">
         </div>
+
+        <!-- حقل التخفيض -->
+<div class="summary-item" style="display:flex; align-items:center; justify-content:space-between; background:rgb(255, 230, 200); padding:6px 12px; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.1); gap:8px; min-height:40px;">
+    <label style="font-weight:600; font-size:0.85rem; color:#495057; white-space:nowrap;"><i class="fas fa-tag"></i> التخفيض (Ctrl+3):</label>
+    <input type="number" id="discount-amount" value="0.000" step="0.001" oninput="updateTotalWithDelivery()" style="flex:1; min-width:60px; max-width:100px; text-align:center; border:1px solid #dee2e6; border-radius:6px; background:white; font-weight:bold; font-size:0.9rem; padding:5px 6px;">
+</div>
+
+<!-- حقل الإجمالي بعد التخفيض -->
+<div class="summary-item" style="display:flex; align-items:center; justify-content:space-between; background:rgb(200, 230, 255); padding:6px 12px; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.1); gap:8px; min-height:40px;">
+    <label style="font-weight:600; font-size:0.85rem; color:#495057; white-space:nowrap;"><i class="fas fa-calculator"></i> بعد التخفيض:</label>
+    <input type="text" id="total-after-discount" readonly value="0.000" style="flex:1; min-width:60px; max-width:100px; text-align:center; border:1px solid #dee2e6; border-radius:6px; background:#f8f9fa; font-weight:bold; font-size:0.9rem; padding:5px 6px;">
+</div>
         <!-- مبلغ التوصيل -->
         <div class="summary-item" style="display:flex; align-items:center; justify-content:space-between; background:white; padding:6px 12px; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.1); gap:8px; min-height:40px;">
             <label style="font-weight:600; font-size:0.85rem; color:#495057; white-space:nowrap;"><i class="fas fa-truck"></i> التوصيل (Ctrl+2):</label>
@@ -1232,7 +1244,7 @@
         
         <!-- الإجمالي مع التوصيل -->
         <div class="summary-item" style="display:flex; align-items:center; justify-content:space-between; background:rgb(170, 229, 252); padding:6px 12px; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.1); gap:8px; min-height:40px;">
-            <label style="font-weight:600; font-size:0.85rem; color:#495057; white-space:nowrap;"><i class="fas fa-receipt"></i> الإجمالي مع التوصيل:</label>
+            <label style="font-weight:600; font-size:0.85rem; color:#495057; white-space:nowrap;"><i class="fas fa-receipt"></i> النهائي:</label>
             <input type="text" id="total-with-delivery" readonly value="0.000" style="flex:1; min-width:60px; max-width:100px; text-align:center; border:1px solid #dee2e6; border-radius:6px; background:#f8f9fa; font-weight:bold; font-size:0.9rem; padding:5px 6px;">
         </div>
         <!-- المدفوع -->
@@ -1267,7 +1279,7 @@
     
     <!-- ===== أزرار الفاتورة المحفوظة ===== -->
     <button class="btn btn-warning" onclick="printLastInvoice()" style="padding:8px 16px; border:none; border-radius:8px; cursor:pointer; font-weight:500; display:inline-flex; align-items:center; gap:8px; transition:0.2s; white-space:nowrap; background:#ff9800; color:white; height:40px;" id="btnPrintLast">
-        <i class="fas fa-print"></i> إعادة الطباعة
+        <i class="fas fa-print"></i> إعادة
     </button>
     <button class="btn btn-secondary" onclick="showLastInvoiceInfo()" style="padding:8px 16px; border:none; border-radius:8px; cursor:pointer; font-weight:500; display:inline-flex; align-items:center; gap:8px; transition:0.2s; white-space:nowrap; background:#6c757d; color:white; height:40px;" id="btnShowLast">
         <i class="fas fa-info-circle"></i> آخر فاتورة
@@ -1276,6 +1288,12 @@
     <button id="btn-preview" class="btn btn-warning" onclick="printPreview()" style="padding:8px 16px; border:none; border-radius:8px; cursor:pointer; font-weight:500; display:inline-flex; align-items:center; gap:8px; transition:0.2s; white-space:nowrap; background:#ffc107; color:#333; height:40px;">معاينة</button>
     <button id="btn-print" class="btn btn-primary" onclick="printInvoice()" style="padding:8px 16px; border:none; border-radius:8px; cursor:pointer; font-weight:500; display:inline-flex; align-items:center; gap:8px; transition:0.2s; white-space:nowrap; background:#007bff; color:white; height:40px;">
     <i class="fas fa-print"></i> طباعة (F8)
+</button>
+<button class="btn btn-secondary" onclick="connectCashDrawer()" style="padding:8px 16px; border:none; border-radius:8px; height:40px; background:#353636; color:white;">
+    <i class="fas fa-plug"></i> ربط
+</button>
+<button class="btn btn-secondary" onclick="openCashDrawer()" style="padding:8px 16px; border:none; border-radius:8px; height:40px; background:#353636; color:white;">
+    <i class="fas fa-cash-register"></i> فتح
 </button>
 </div>
 
@@ -2034,15 +2052,15 @@
         // روابط السكربتات المنفصلة
         // ===================================================================
         
-        const PRODUCTS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxw2bXCjDoPXWc5L4JHZ71G2deztfrPIg8QCycdWUmY5_saCC9IR6LEso-piS7eyF2c/exec';
+        const PRODUCTS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyehyZa9ilj1F-WgaABiK2tb3Fj7d7PZP17KOeihQH7BJVipTA-n6iHG6iub08K-48W/exec';
        const PRODUCT_SHEET_ID = '16mzoKiUGrZXHJ1l7RY2wjiKyF3eu1RGx1gU0FxfmTMg';
         const PRODUCT_SHEET_NAME = 'Products';
         const CUSTOMERS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzeqhudPgRe4_OZFjQQXByurqyctQRWGlcFJ2HU2yDLIBAwgzN9-Fp_FnuMho7QP2a3/exec';
-        const BILLS_SHEET_URL = 'https://script.google.com/macros/s/AKfycbwQD3jue5WwZlr2wGhxEQpHKBdgKqliI2ctvr_GBy1Xb1y7Y4KU5Sq4Mv23qLBS62Jh/exec';
+        const BILLS_SHEET_URL = 'https://script.google.com/macros/s/AKfycbzbtpBwVESqSa2_plu7dC4LtVlzzbUbxMpcC9UpPa8ahZtmrGVmT1bh6FdfPt2XYpQF/exec';
        const USERS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyK4j--1pg9TxAkaTKWTZ1_xgi1gbPsN7h9d-BuzAgiXY8Kv65vX_eYWag-N1DyF_-b/exec';
        const SUPBILL_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwdBzcGLNuHkFOrj-J4JZ9kL9VMTm9Mb9p9zHBTtjGkMrikwFYHsEDAg3nG1_FvPB9qKw/exec'; // <-- رابط سكربت الموردي
        const COMPANY_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwqttdDnHpSklFkcBkgonU4kqEYnK2aefCEqUUiYaz_nMe7IKf_wT4R1MNDMyMAnr8abA/exec';
-        const ADD_TRASH_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx7280n_hBQ7YfyIfCoQQR-vebJxgg7KMvnzVef3fOhWGZYmwAY3qQNilNncbvAnreIZA/exec'; // ضع رابط السكربت هنا
+        const ADD_TRASH_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwhzdXq5wpG0Hb4UX5Ya9dhcZrvfnaLPPEzV0Z1dnVKZKC93EFbXdXVeQZkH_yL3LU0/exec'; // ضع رابط السكربت هنا
         
        let SPLASH_LOGO_URL = 'https://via.placeholder.com/200/1e2a5a/ffffff?text=Logo';
         let LOGIN_LOGO_URL = 'https://via.placeholder.com/120/1e2a5a/ffffff?text=Logo';
@@ -2074,7 +2092,7 @@
         let currentCompanyId = null;
         let allAddTrashOperations = [];          // جميع عمليات الإضافة/الشطب
         let productOperationsCache = {};         // تخزين عمليات كل منتج (لتجنب التحميل المتكرر)
-
+        
           document.getElementById('splashLogo').src = SPLASH_LOGO_URL;
         document.getElementById('loginLogo').src = LOGIN_LOGO_URL;
         document.getElementById('welcomeLogo').src = WELCOME_LOGO_URL;
@@ -2734,33 +2752,26 @@ function togglePasswordVisibilityRow(btn, password) {
         // المنتجات - نفس الكود السابق مع تعديل طفيف
         // ===================================================================
         
-      function loadProducts() {
+   function loadProducts() {
     if (!currentUser || currentUser.adminProducts !== 'TRUE') {
         document.getElementById('productsTableBody').innerHTML = '<tr><td colspan="14" class="text-center text-warning">⚠️ ليس لديك صلاحية لعرض المنتجات</td></tr>';
         return;
     }
     document.getElementById('productsTableBody').innerHTML = '<tr><td colspan="14" class="text-center"><span class="spinner-border spinner-border-sm me-2"></span>جار التحميل...</td></tr>';
-    
-    // ===== جلب المنتجات =====
+
     const params = new URLSearchParams();
     params.append('action', 'read');
     params.append('sheetId', PRODUCT_SHEET_ID);
     params.append('sheetName', PRODUCT_SHEET_NAME);
-    
-    const url = PRODUCTS_SCRIPT_URL + '?' + params.toString();
-    
-    fetch(url, {
-        method: 'GET',
-        mode: 'cors',
-        headers: { 'Accept': 'application/json' }
+
+    fetch(PRODUCTS_SCRIPT_URL + '?' + params.toString(), {
+        method: 'GET', mode: 'cors', headers: { 'Accept': 'application/json' }
     })
-    .then(response => {
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        return response.json();
-    })
+    .then(r => { if (!r.ok) throw new Error(`HTTP error! status: ${r.status}`); return r.json(); })
     .then(result => {
         if (result.status === 'success' && result.data) {
             allProducts = result.data || [];
+            productOperationsCache = {};
             allProducts.reverse();
             productsData = allProducts.map(p => ({
                 id: p.id || p.ProductID,
@@ -2778,30 +2789,15 @@ function togglePasswordVisibilityRow(btn, password) {
                 ProdBenefits: parseFloat(p.ProdBenefits) || 0
             }));
             isProductsLoaded = true;
-            
-            // ===== بعد تحميل المنتجات، نقوم بتحميل عمليات الإضافة/الشطب =====
-            loadAddTrashOperations().then(() => {
-                // تحديث واجهة المستخدم
-                updateProductFilterOptions();
-                applyProductFilters();
-                document.getElementById('productCount').textContent = `عدد المنتجات: ${allProducts.length}`;
-                renderPopupProducts(productsData);
-                showToast('✅ تم تحميل المنتجات والعمليات بنجاح', 'success');
-            }).catch(err => {
-                console.warn('⚠️ فشل تحميل العمليات:', err);
-                // حتى لو فشلت العمليات، نعرض المنتجات
-                updateProductFilterOptions();
-                applyProductFilters();
-                document.getElementById('productCount').textContent = `عدد المنتجات: ${allProducts.length}`;
-                renderPopupProducts(productsData);
-                showToast('⚠️ تم تحميل المنتجات لكن فشل تحميل العمليات', 'warning');
-            });
+            updateProductFilterOptions();
+            applyProductFilters();
+            document.getElementById('productCount').textContent = `عدد المنتجات: ${allProducts.length}`;
+            renderPopupProducts(productsData);
         } else {
             throw new Error(result.message || 'خطأ في جلب المنتجات');
         }
     })
     .catch(err => {
-        console.error('❌ خطأ في loadProducts:', err);
         document.getElementById('productsTableBody').innerHTML = `<tr><td colspan="14" class="text-center text-danger">❌ خطأ في جلب البيانات: ${err.message}</td></tr>`;
         showToast('❌ فشل تحميل المنتجات: ' + err.message, 'error');
     });
@@ -2872,12 +2868,14 @@ function togglePasswordVisibilityRow(btn, password) {
             <input type="text" id="inputSection" class="form-control form-control-sm" placeholder="القسم" list="sectionList" autocomplete="off" />
             <datalist id="sectionList"></datalist>
         </td>
-                <div style="display:flex; gap:4px; align-items:center;">
-        <input type="text" id="inputBarcode" class="form-control form-control-sm" placeholder="باركود" style="flex:1;" />
-        <button class="btn btn-sm btn-outline-secondary" onclick="generateBarcode()" title="إنشاء باركود تلقائي">
-            <i class="fas fa-qrcode"></i>
-        </button>
-    </div>
+        <td>
+            <div style="display:flex; gap:4px; align-items:center;">
+                <input type="text" id="inputBarcode" class="form-control form-control-sm" placeholder="باركود" style="flex:1;" />
+                <button class="btn btn-sm btn-outline-secondary" onclick="generateBarcode()" title="إنشاء باركود تلقائي">
+                    <i class="fas fa-qrcode"></i>
+                </button>
+            </div>
+        </td>
         <td><input type="text" id="inputName" class="form-control form-control-sm" placeholder="اسم المنتج" /></td>
         <td><input type="text" id="inputAvailable" class="form-control form-control-sm" readonly style="background:#f8f9fa;" value="تلقائي" /></td>
         <td><input type="number" id="inputLastAdd" class="form-control form-control-sm" placeholder="0" value="0" step="1" min="0" style="background:#f8f9fa;" /></td>
@@ -2893,50 +2891,47 @@ function togglePasswordVisibilityRow(btn, password) {
     `;
     tbody.appendChild(inputRow);
 
-    // عرض المنتجات
+    // ===== بناء صفوف المنتجات كنص HTML واحد بدل إنشاء كل صف على حدة =====
     if (!products || products.length === 0) {
-        const emptyRow = document.createElement('tr');
-        emptyRow.innerHTML = '<td colspan="14" class="text-center text-muted">لا توجد منتجات مطابقة للبحث</td>';
-        tbody.appendChild(emptyRow);
+        tbody.insertAdjacentHTML('beforeend', '<tr><td colspan="14" class="text-center text-muted">لا توجد منتجات مطابقة للبحث</td></tr>');
     } else {
+        let rowsHtml = '';
         products.forEach((p, idx) => {
-    const tr = document.createElement('tr');
-    tr.dataset.id = p.id;
-    tr.dataset.productid = p.id;  // إضافة لسهولة الوصول
+            const price = parseFloat(p.ProdPrice) || 0;
+            const vatPercent = parseFloat(p['ProdVat%']) || 0;
+            const vatP = price * (vatPercent / 100);
+            const total = price + vatP;
+            const available = parseFloat(p.ProdAvailable) || 0;
+            const stock = parseFloat(p.ProdStock) || 0;
+            const spent = parseFloat(p.ProdSpent) || 0;
+            const lastAdd = parseFloat(p.ProdLastAdd) || 0;
 
-    const price = parseFloat(p.ProdPrice) || 0;
-    const vatPercent = parseFloat(p['ProdVat%']) || 0;
-    const vatP = price * (vatPercent / 100);
-    const total = price + vatP;
-    const available = parseFloat(p.ProdAvailable) || 0;
-    const stock = parseFloat(p.ProdStock) || 0;
-    const spent = parseFloat(p.ProdSpent) || 0;
-    const lastAdd = parseFloat(p.ProdLastAdd) || 0;
-
-    tr.innerHTML = `
-        <td>${idx+1}</td>
-        <td>${p.ProdSupplier||''}</td>
-        <td>${p.ProdSection||''}</td>
-        <td style="cursor:pointer; color:#1e2a5a; font-weight:bold;" onclick="toggleProductOperations('${p.id}', this)">${p.ProdBarcode||''}</td>
-        <td>${p.ProdName||''}</td>
-        <td>${available}</td>
-        <td>${lastAdd}</td>
-        <td>${stock}</td>
-        <td>${spent}</td>
-        <td>${price.toFixed(2)}</td>
-        <td>${vatPercent}</td>
-        <td>${vatP.toFixed(2)}</td>
-        <td>${total.toFixed(2)}</td>
-        <td class="action-btns">
-            <button class="btn btn-success btn-sm add-product-btn" data-id="${p.id}" title="إضافة او شطب من المخزون">
-                <i class="fas fa-plus-circle"></i>
-            </button>
-            <button class="btn btn-warning btn-sm edit-product-btn" data-id="${p.id}"><i class="fas fa-edit"></i></button>
-            <button class="btn btn-danger btn-sm delete-product-btn" data-id="${p.id}" data-name="${p.ProdName}"><i class="fas fa-trash"></i></button>
-        </td>
-    `;
-    tbody.appendChild(tr);
-});
+            rowsHtml += `
+                <tr data-id="${p.id}" data-productid="${p.id}">
+                    <td>${idx+1}</td>
+                    <td>${p.ProdSupplier||''}</td>
+                    <td>${p.ProdSection||''}</td>
+                    <td style="cursor:pointer; color:#1e2a5a; font-weight:bold;" onclick="toggleProductOperations('${p.id}', this)">${p.ProdBarcode||''}</td>
+                    <td>${p.ProdName||''}</td>
+                    <td>${available}</td>
+                    <td>${lastAdd}</td>
+                    <td>${stock}</td>
+                    <td>${spent}</td>
+                    <td>${price.toFixed(2)}</td>
+                    <td>${vatPercent}</td>
+                    <td>${vatP.toFixed(2)}</td>
+                    <td>${total.toFixed(2)}</td>
+                    <td class="action-btns">
+                        <button class="btn btn-success btn-sm add-product-btn" data-id="${p.id}" title="إضافة او شطب من المخزون">
+                            <i class="fas fa-plus-circle"></i>
+                        </button>
+                        <button class="btn btn-warning btn-sm edit-product-btn" data-id="${p.id}"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-danger btn-sm delete-product-btn" data-id="${p.id}" data-name="${p.ProdName}"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `;
+        });
+        tbody.insertAdjacentHTML('beforeend', rowsHtml);
     }
 
     document.getElementById('productCount').textContent = `عدد المنتجات: ${products ? products.length : 0}`;
@@ -2947,24 +2942,29 @@ function togglePasswordVisibilityRow(btn, password) {
     // ===== إضافة أحداث الإكمال التلقائي =====
     setupAutocomplete();
 
+    // زر الإضافة في صف الإدخال (عنصر واحد فقط، يُعاد إنشاؤه مع كل render فلا بأس بربطه هنا)
     document.getElementById('addProductBtn').addEventListener('click', addProductFromRow);
-    document.querySelectorAll('.edit-product-btn').forEach(btn => btn.addEventListener('click', function() { 
-        loadProductForEdit(this.dataset.id); 
-    }));
-    document.querySelectorAll('.delete-product-btn').forEach(btn => btn.addEventListener('click', function() { 
-        if (confirm(`حذف "${this.dataset.name}"؟`)) deleteProduct(this.dataset.id); 
-    }));
-document.querySelectorAll('.add-product-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        const productId = this.dataset.id;
-        openAddOrTrashModal(productId);
-    });
-});
     
     if (editingProductId) {
         loadProductForEdit(editingProductId);
     }
 }
+
+// تفويض الأحداث لأزرار صفوف المنتجات - يُضاف مرة واحدة فقط في حياة الصفحة
+document.getElementById('productsTableBody').addEventListener('click', function(e) {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+
+    if (btn.classList.contains('edit-product-btn')) {
+        loadProductForEdit(btn.dataset.id);
+    } else if (btn.classList.contains('delete-product-btn')) {
+        if (confirm(`حذف "${btn.dataset.name}"؟`)) {
+            deleteProduct(btn.dataset.id);
+        }
+    } else if (btn.classList.contains('add-product-btn')) {
+        openAddOrTrashModal(btn.dataset.id);
+    }
+});
 
 // توليد الباركود 
 function generateBarcode() {
@@ -3238,96 +3238,147 @@ async function toggleProductOperations(productId, tdElement) {
     const row = tdElement.closest('tr');
     const nextRow = row.nextElementSibling;
 
-    // إذا كان الصف الفرعي موجوداً ومعروضاً، نخفيه ونعود
-    if (nextRow && nextRow.classList.contains('product-sub-row') && nextRow.style.display !== 'none') {
-        nextRow.style.display = 'none';
+    // ✅ 1. إذا كان الصف الفرعي موجوداً → إظهار/إخفاء بسيط
+    if (nextRow && nextRow.classList.contains('product-sub-row')) {
+        nextRow.style.display = nextRow.style.display === 'none' ? 'table-row' : 'none';
         return;
     }
 
-    // إخفاء أي صف فرعي مفتوح آخر (اختياري)
+    // إخفاء أي صف فرعي مفتوح آخر
     document.querySelectorAll('.product-sub-row').forEach(r => r.style.display = 'none');
 
-    // إذا كان الصف الفرعي موجوداً لكنه مخفي، نظهره
-    if (nextRow && nextRow.classList.contains('product-sub-row')) {
-        nextRow.style.display = 'table-row';
+    // ✅ 2. جلب من الكاش المحلي أولاً
+    let ops = productOperationsCache[productId];
+
+    // ✅ 3. إذا لم يكن في الكاش → جلب من السيرفر مع لودنج
+    if (!ops) {
+        const originalContent = tdElement.innerHTML;
+        
+        // إظهار اللودنج
+        tdElement.innerHTML = `
+            <span class="spinner-border spinner-border-sm text-primary"
+                  role="status"
+                  style="width:14px; height:14px; border-width:2px; vertical-align:middle; margin-left:5px;">
+            </span>
+            <span style="color:#1e2a5a; opacity:0.6;">${originalContent}</span>
+        `;
+        tdElement.style.pointerEvents = 'none';
+
+        try {
+            ops = await fetchProductOperations(productId);
+            // ✅ تخزين في الكاش المحلي
+            productOperationsCache[productId] = ops;
+        } catch (err) {
+            tdElement.innerHTML = originalContent;
+            tdElement.style.pointerEvents = '';
+            showToast('❌ فشل تحميل العمليات: ' + err.message, 'error');
+            return;
+        }
+
+        tdElement.innerHTML = originalContent;
+        tdElement.style.pointerEvents = '';
+    }
+
+    // ✅ 4. إذا لا توجد عمليات → رسالة فقط بدون لودنج
+    if (!ops || ops.length === 0) {
+        const subRow = document.createElement('tr');
+        subRow.className = 'product-sub-row';
+        subRow.style.display = 'table-row';
+
+        const cell = document.createElement('td');
+        cell.colSpan = 14;
+        cell.style.padding = '15px';
+        cell.style.background = '#f8f9fa';
+        cell.innerHTML = `
+            <p class="text-muted text-center" style="margin:0;">
+                <i class="fas fa-info-circle"></i> لا توجد عمليات لهذا المنتج
+            </p>
+        `;
+        subRow.appendChild(cell);
+        row.parentNode.insertBefore(subRow, row.nextSibling);
         return;
     }
 
-    // التأكد من تحميل العمليات (قد لا تكون جاهزة بعد)
-    if (allAddTrashOperations.length === 0) {
-        try {
-            await loadAddTrashOperations();
-        } catch (error) {
-            console.error('خطأ في تحميل العمليات:', error);
-            showToast('❌ فشل تحميل العمليات: ' + error.message, 'error');
-            return;
-        }
-    }
+    // ✅ 5. بناء جدول الصفوف
+    let html = `
+        <div class="table-responsive-wrapper">
+            <table class="table table-sm table-bordered" style="margin:0; font-size:0.8rem;">
+                <thead>
+                    <tr>
+                        <th style="background:silver !important; color:#000 !important;">#</th>
+                        <th style="background:silver !important; color:#000 !important;">التاريخ</th>
+                        <th style="background:silver !important; color:#000 !important;">النوع</th>
+                        <th style="background:silver !important; color:#000 !important;">العدد</th>
+                        <th style="background:silver !important; color:#000 !important;">السعر</th>
+                        <th style="background:silver !important; color:#000 !important;">الضريبة</th>
+                        <th style="background:silver !important; color:#000 !important;">الإجمالي</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
 
-    // فلترة العمليات لهذا المنتج
-    // ملاحظة: قد يكون الحقل في الجدول اسمه 'ProductID' أو 'ProductId'، تحقق من البيانات
-    const ops = allAddTrashOperations.filter(op => {
-        // حاول مطابقة بأكثر من طريقة
-        const opProductId = op.ProductID || op.ProductId || op.productId || '';
-        return String(opProductId) === String(productId);
+    ops.forEach((op, idx) => {
+        const state = op.AdTrState || '';
+        const isAdd = state === 'إضافة';
+        const color = isAdd ? '#28a745' : '#dc3545';
+        const bgColor = isAdd ? '#d4edda' : '#f8d7da';
+        html += `
+            <tr style="background:${bgColor};">
+                <td>${idx + 1}</td>
+                <td>${op.Timestamp || ''}</td>
+                <td style="color:${color}; font-weight:bold;">${state}</td>
+                <td>${op.AdTrNo || 0}</td>
+                <td>${(parseFloat(op.AdTrPrice) || 0).toFixed(2)}</td>
+                <td>${(parseFloat(op.AdTrPriceVat) || 0).toFixed(2)}</td>
+                <td>${(parseFloat(op.AdTrTotal) || 0).toFixed(2)}</td>
+            </tr>
+        `;
     });
+    html += `</tbody></table></div>`;
 
-    // نرتب العمليات حسب التاريخ (الأحدث أولاً)
-    ops.sort((a, b) => (b.Timestamp || '').localeCompare(a.Timestamp || ''));
-
-    // إنشاء الصف الفرعي
     const subRow = document.createElement('tr');
     subRow.className = 'product-sub-row';
     subRow.style.display = 'table-row';
+
     const cell = document.createElement('td');
-    cell.colSpan = 14; // عدد الأعمدة في الجدول (حسب عدد الأعمدة الموجودة)
+    cell.colSpan = 14;
     cell.style.padding = '10px';
     cell.style.background = '#f8f9fa';
-
-    let html = ``;
-    if (ops.length === 0) {
-        html += `<p class="text-muted text-center">لا توجد عمليات لهذا المنتج</p>`;
-    } else {
-        html += `
-            <div class="table-responsive-wrapper">
-                   <table class="table table-sm table-bordered" style="margin:0; font-size:0.8rem;">
-                    <thead>
-                        <tr>
-                            <th style="background:silver !important; color:#000 !important;">#</th>
-                            <th style="background:silver !important; color:#000 !important;">التاريخ</th>
-                            <th style="background:silver !important; color:#000 !important;">النوع</th>
-                            <th style="background:silver !important; color:#000 !important;">العدد</th>
-                            <th style="background:silver !important; color:#000 !important;">السعر</th>
-                            <th style="background:silver !important; color:#000 !important;">الضريبة</th>
-                            <th style="background:silver !important; color:#000 !important;">الإجمالي</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-        `;
-        ops.forEach((op, idx) => {
-            const state = op.AdTrState || '';
-            const isAdd = state === 'إضافة';
-            const color = isAdd ? '#28a745' : '#dc3545';
-            const bgColor = isAdd ? '#d4edda' : '#f8d7da';
-            html += `
-                <tr style="background:${bgColor};">
-                    <td>${idx + 1}</td>
-                    <td>${op.Timestamp || ''}</td>
-                    <td style="color:${color}; font-weight:bold;">${state}</td>
-                    <td>${op.AdTrNo || 0}</td>
-                    <td>${(parseFloat(op.AdTrPrice) || 0).toFixed(2)}</td>
-                    <td>${(parseFloat(op.AdTrPriceVat) || 0).toFixed(2)}</td>
-                    <td>${(parseFloat(op.AdTrTotal) || 0).toFixed(2)}</td>
-                </tr>
-            `;
-        });
-        html += `</tbody></table></div>`;
-    }
     cell.innerHTML = html;
-    subRow.appendChild(cell);
 
-    // إدراج الصف الفرعي بعد الصف الحالي
+    subRow.appendChild(cell);
     row.parentNode.insertBefore(subRow, row.nextSibling);
+}
+
+
+// ===================================================================
+// ✅ جلب عمليات منتج واحد من السيرفر (سريع)
+// ===================================================================
+async function fetchProductOperations(productId) {
+    const url = `${ADD_TRASH_SCRIPT_URL}?action=readByProduct&productId=${encodeURIComponent(productId)}`;
+    
+    const response = await fetch(url, { 
+        method: 'GET', 
+        mode: 'cors',
+        headers: { 'Accept': 'application/json' }
+    });
+    
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const result = await response.json();
+    
+    if (result.status === 'success' && Array.isArray(result.data)) {
+        // ترتيب حسب التاريخ (الأحدث أولاً)
+        result.data.sort((a, b) => 
+            String(b.Timestamp || '').localeCompare(String(a.Timestamp || ''))
+        );
+        console.log(`✅ تم جلب ${result.data.length} عملية للمنتج ${productId}${result.fromCache ? ' (من الكاش)' : ''}`);
+        return result.data;
+    }
+    
+    throw new Error(result.message || 'فشل جلب العمليات');
 }
 
 
@@ -4407,6 +4458,7 @@ async function fetchCustomers() {
     }
 }
 
+
     async function addToCart(product, qty = 1) {
     const existing = cartItems.find(i => i.id === product.id);
     const currentQty = existing ? existing.qty : 0;
@@ -4575,12 +4627,20 @@ function renderCart() {
         `;
     });
 }
-                    function fix3(num) { return Math.round((num + Number.EPSILON) * 1000) / 1000; }
-                    function toFixed3(num) { return fix3(num).toFixed(3); }
+                    
 
-                function updateTotalWithDelivery() {
+function fix3(num) { 
+    return Math.round((num + Number.EPSILON) * 1000) / 1000; 
+}
+
+function toFixed3(num) { 
+    return fix3(num).toFixed(3); 
+}
+
+   function updateTotalWithDelivery() {
     let totalQty = 0, totalVat = 0, amountSum = 0, totalSum = 0;
     
+    // ===== جمع قيم السلة =====
     cartItems.forEach(i => {
         totalQty += i.qty;
         totalVat += fix3(i.vatTotal || 0);
@@ -4588,31 +4648,67 @@ function renderCart() {
         totalSum += fix3(i.totalWithVat || (i.total + (i.vatTotal || 0)));
     });
     
-    const deliveryPrice = fix3(parseFloat(document.getElementById('delivery-price').value) || 0);
-    const totalWithDelivery = fix3(totalSum + deliveryPrice);
+    // ===== قراءة قيم التوصيل والتخفيض =====
+    const deliveryPrice  = fix3(parseFloat(document.getElementById('delivery-price').value) || 0);
+    const discountAmount = fix3(parseFloat(document.getElementById('discount-amount').value) || 0);
     
-    document.getElementById('total-qty').value = totalQty;
-    document.getElementById('total-vat').value = toFixed3(totalVat);
+    // ===== 1) المجموع + الضريبة =====
+    const sumWithVat = fix3(totalSum);
+    
+    // ===== 2) الإجمالي بعد التخفيض (لا يتأثر بالتوصيل) =====
+    const totalAfterDiscount = fix3(sumWithVat - discountAmount);
+    
+    // ===== 3) الإجمالي النهائي (بعد التخفيض + التوصيل) =====
+    const totalFinal = fix3(totalAfterDiscount + deliveryPrice);
+    
+    // ===== عرض القيم =====
+    document.getElementById('total-qty').value   = totalQty;
+    document.getElementById('total-vat').value   = toFixed3(totalVat);
     document.getElementById('total-amount').value = toFixed3(amountSum);
-    document.getElementById('total-sum').value = toFixed3(totalSum);
-    document.getElementById('total-with-delivery').value = toFixed3(totalWithDelivery);
+    document.getElementById('total-sum').value   = toFixed3(sumWithVat);
     
+    // ✅ يتأثر بالتخفيض فقط
+    document.getElementById('total-after-discount').value = toFixed3(totalAfterDiscount);
+    
+    // ✅ يتأثر بالتخفيض + التوصيل
+    document.getElementById('total-with-delivery').value  = toFixed3(totalFinal);
+    
+    // ===== إعادة حساب الباقي =====
     calculateRemaining();
 }
 
 
-                    function calculateRemaining() {
-                        const total = fix3(parseFloat(document.getElementById('total-with-delivery').value) || 0);
-                        const paid = fix3(parseFloat(document.getElementById('paid-amount').value) || 0);
-                        document.getElementById('remaining-amount').value = toFixed3(fix3(total - paid));
-                    }
+function calculateRemaining() {
+    // الإجمالي النهائي (بعد التخفيض + التوصيل)
+    const total = fix3(parseFloat(document.getElementById('total-with-delivery').value) || 0);
+    const paid  = fix3(parseFloat(document.getElementById('paid-amount').value) || 0);
+    const remaining = fix3(total - paid);
+    
+    document.getElementById('remaining-amount').value = toFixed3(remaining);
+    
+    // لون الحقل
+    const el = document.getElementById('remaining-amount');
+    if (remaining <= 0.001 && paid > 0)      el.style.color = '#28a745'; // أخضر
+    else if (paid > 0.001)                    el.style.color = '#ff9800'; // برتقالي
+    else                                      el.style.color = '#dc3545'; // أحمر
+    el.style.fontWeight = 'bold';
+}
 
-                    function payFullAmount() {
-                        const total = parseFloat(document.getElementById('total-with-delivery').value) || 0;
-                        document.getElementById('paid-amount').value = toFixed3(total);
-                        calculateRemaining();
-                        showToast(`✅ تم دفع المبلغ كاملاً: ${toFixed3(total)} ر.س`, 'success');
-                    }
+   
+function payFullAmount() {
+    const totalFinal = fix3(parseFloat(document.getElementById('total-with-delivery').value) || 0);
+    
+    if (totalFinal <= 0) {
+        showToast('⚠️ الإجمالي صفر، لا يوجد مبلغ للدفع', 'warning');
+        return;
+    }
+    
+    document.getElementById('paid-amount').value = toFixed3(totalFinal);
+    calculateRemaining();
+    
+    showToast(`✅ تم دفع المبلغ كاملاً: ${toFixed3(totalFinal)} ر.س`, 'success');
+    focusBarcodeInput();
+}
 
                     function clearCashierWithConfirm() {
                         if (cartItems.length === 0) { showToast('لا توجد منتجات لمسحها', 'info'); return; }
@@ -4687,6 +4783,7 @@ function renderCart() {
     
     document.getElementById('paid-amount').value = '0.000';
     document.getElementById('delivery-price').value = '0.000';
+    document.getElementById('discount-amount').value = '0.000';   // جديد
     document.getElementById('payment-method').value = 'Cash';
     document.getElementById('invoice-number').innerText = '';
     document.getElementById('btn-print').disabled = true;
@@ -4695,245 +4792,453 @@ function renderCart() {
     document.getElementById('barcode-reader').focus();
 }
 
-  function prepareInvoiceData(actionType) {
-    const totalQty = cartItems.reduce((s,i)=>s+i.qty,0);
-    const totalPxQ = fix3(cartItems.reduce((s,i)=>s + fix3(i.purchasePrice * i.qty),0));
-    const totalVat = fix3(cartItems.reduce((s,i)=>s + fix3((i.vatTotal || 0)),0));
-    const totalAmountWithVat = fix3(cartItems.reduce((s,i)=>s + fix3(i.totalWithVat || (i.total + (i.vatTotal || 0))),0));
-    const totalDiscount = 0;
-    const totalAfterDiscount = fix3(totalAmountWithVat);
-    const paid = fix3(parseFloat(document.getElementById('paid-amount').value) || 0);
-    const deliveryPrice = fix3(parseFloat(document.getElementById('delivery-price').value) || 0);
+ function prepareInvoiceData(actionType) {
+    // ===== 1) مجاميع المنتجات =====
+    const totalQty           = cartItems.reduce((s, i) => s + i.qty, 0);
+    const totalPxQ           = fix3(cartItems.reduce((s, i) => s + fix3(i.purchasePrice * i.qty), 0));
+    const totalVat           = fix3(cartItems.reduce((s, i) => s + fix3(i.vatTotal || 0), 0));
+    const totalAmountWithVat = fix3(cartItems.reduce((s, i) => s + fix3(i.totalWithVat || (i.total + (i.vatTotal || 0))), 0));
+
+    // ===== 2) قراءة المدخلات =====
+    const discountAmount = fix3(parseFloat(document.getElementById('discount-amount').value) || 0);
+    const deliveryPrice  = fix3(parseFloat(document.getElementById('delivery-price').value) || 0);
+    const paid           = fix3(parseFloat(document.getElementById('paid-amount').value) || 0);
+
+    // ===== 3) الحسابات ✅ =====
+    // الإجمالي بعد التخفيض = المجموع + الضريبة − التخفيض   (بدون توصيل)
+    const totalAfterDiscount = fix3(totalAmountWithVat - discountAmount);
+
+    // الإجمالي النهائي = الإجمالي بعد التخفيض + التوصيل
     const totalWithDelivery = fix3(totalAfterDiscount + deliveryPrice);
+
+    // الباقي = الإجمالي النهائي − المدفوع
     const balance = fix3(totalWithDelivery - paid);
+
     const now = new Date();
-    
+
     return {
         action: actionType,
         BillNo: currentBillNumber || '',
         branch: "MCT",
-        BillCashair: document.getElementById('cashier-name').innerText,
+        BillCashair:  document.getElementById('cashier-name').innerText,
         BillCustomer: document.getElementById('customer-name').value || 'غير معرف',
-        BillPhone: document.getElementById('customer-phone').value || '',
+        BillPhone:    document.getElementById('customer-phone').value || '',
         BillLocation: document.getElementById('customer-location').value || '',
         BillDate: `${now.getMonth()+1}/${now.getDate()}/${now.getFullYear()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`,
-        BillTotQNT: totalQty,
-        BillTotPxQ: toFixed3(totalPxQ),
-        BillTotVat: toFixed3(totalVat),
-        BillTotAMvVAT: toFixed3(totalAmountWithVat),
-        BillTotDiscount: toFixed3(0),
-        BillTotAMvDIS: toFixed3(totalAfterDiscount),
+
+        // مجاميع المنتجات
+        BillTotQNT:     totalQty,
+        BillTotPxQ:     toFixed3(totalPxQ),
+        BillTotVat:     toFixed3(totalVat),
+        BillTotAMvVAT:  toFixed3(totalAmountWithVat),
+
+        // ✅ التخفيض
+        BillTotDiscount: toFixed3(discountAmount),
+
+        // ✅ الإجمالي بعد التخفيض (بدون توصيل)
+        BillTotAMvDIS:   toFixed3(totalAfterDiscount),
+
+        // الدفع
         BillAdvance: toFixed3(paid),
         BillBalance: toFixed3(balance),
-        BillWay: document.getElementById('payment-method').value,
-        BillStatue: paid === 0 ? "غير مدفوع" : (balance === 0 ? "مدفوع بالكامل" : "مدفوع جزئي"),
-        BillBarcode: cartItems.map(i=>i.barcode||'').join(','),
-        BillSection: cartItems.map(i=>i.section||'').join(','),
-        BillProducts: cartItems.map(i=>i.name).join(','),
-        BillPrice: cartItems.map(i=>fix3(i.purchasePrice).toFixed(3)).join(','),
-        BillQNT: cartItems.map(i=>i.qty).join(','),
-        BillPxQ: cartItems.map(i=>fix3(i.Amount).toFixed(3)).join(','),
-        BillVat: cartItems.map(i=>fix3(i.vatTotal || 0).toFixed(3)).join(','),
-        BillDelivery: toFixed3(deliveryPrice),
-        BillTotalDelivery: toFixed3(totalWithDelivery),
+        BillWay:     document.getElementById('payment-method').value,
+        BillStatue:  paid === 0 ? "غير مدفوع" : (balance <= 0.001 ? "مدفوع بالكامل" : "مدفوع جزئي"),
+
+        // مصفوفات المنتجات
+        BillBarcode:  cartItems.map(i => i.barcode  || '').join(','),
+        BillSection:  cartItems.map(i => i.section  || '').join(','),
+        BillProducts: cartItems.map(i => i.name).join(','),
+        BillPrice:    cartItems.map(i => fix3(i.purchasePrice).toFixed(3)).join(','),
+        BillQNT:      cartItems.map(i => i.qty).join(','),
+        BillPxQ:      cartItems.map(i => fix3(i.Amount).toFixed(3)).join(','),
+        BillVat:      cartItems.map(i => fix3(i.vatTotal || 0).toFixed(3)).join(','),
         BillDiscount: '0',
-        BillAmount: cartItems.map(i=>fix3(i.totalWithVat || (i.total + (i.vatTotal || 0))).toFixed(3)).join(',')
+        BillAmount:   cartItems.map(i => fix3(i.totalWithVat || (i.total + (i.vatTotal || 0))).toFixed(3)).join(','),
+
+        // ✅ التوصيل
+        BillDelivery: toFixed3(deliveryPrice),
+
+        // ✅ الإجمالي النهائي = بعد التخفيض + التوصيل
+        BillTotalDelivery: toFixed3(totalWithDelivery)
     };
 }
 
 
- async function saveInvoice() {
-    if (cartItems.length === 0) { 
-        showToast('⚠️ لا توجد منتجات', 'warning'); 
-        return; 
+// ===================================================================
+// تحديث شامل للبيانات قبل حفظ الفاتورة (سريع + متوازي + آمن)
+// ===================================================================
+async function refreshAllData(options = {}) {
+    const { silent = true, timeout = 3000 } = options;
+    
+    let toastEl = null;
+    if (!silent) {
+        toastEl = showToast('⏳ جاري تحديث البيانات...', 'loading');
     }
     
-    const overlay = createLoadingOverlay('جاري حفظ الفاتورة...');
-    document.body.appendChild(overlay);
+    const tasks = [
+        // 1. المنتجات (الأهم - لتحديث المخزون)
+        fetchProducts().catch(err => {
+            console.warn('⚠️ فشل تحديث المنتجات:', err);
+            return null;
+        }),
+        
+        // 2. الزبائن
+        fetchCustomers().catch(err => {
+            console.warn('⚠️ فشل تحديث الزبائن:', err);
+            return null;
+        }),
+        
+        // 3. رقم الفاتورة القادم
+        fetch(`${BILLS_SHEET_URL}?action=getNextBillPreview&branch=MCT`, {
+            method: 'GET',
+            mode: 'cors'
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.status === 'success' && data.BillNo) {
+                currentBillNumber = data.BillNo;
+                const el = document.getElementById('invoice-number');
+                if (el) el.innerText = data.BillNo;
+                return data.BillNo;
+            }
+            return null;
+        })
+        .catch(err => {
+            console.warn('⚠️ فشل جلب رقم الفاتورة:', err);
+            return null;
+        })
+    ];
     
     try {
-        // ===== 1. جلب رقم فاتورة جديد =====
-        let billNumber;
+        // ⚡ سباق بين الطلبات والـ Timeout
+        await Promise.race([
+            Promise.all(tasks),
+            new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('TIMEOUT')), timeout)
+            )
+        ]);
+        
+        if (!silent && toastEl) toastEl.remove();
+        return true;
+        
+    } catch (error) {
+        if (!silent && toastEl) toastEl.remove();
+        console.warn('⚠️ تحديث جزئي:', error.message);
+        return false; // نكمل الحفظ بأي حال
+    }
+}
+
+
+
+ async function saveInvoice() {
+    if (cartItems.length === 0) {
+        showToast('⚠️ لا توجد منتجات', 'warning');
+        return;
+    }
+   await refreshAllData({ silent: true, timeout: 3000 });
+    // ══════════════════════════════════════════════════════════════
+    // المرحلة 0: Snapshot كامل لكل ما نحتاجه لاحقاً
+    // ══════════════════════════════════════════════════════════════
+    const cartSnapshot          = JSON.parse(JSON.stringify(cartItems));
+    const customerNameSnapshot  = document.getElementById('customer-name').value;
+    const customerPhoneSnapshot = document.getElementById('customer-phone').value;
+    const customerLocSnapshot   = document.getElementById('customer-location').value;
+    const paymentMethodSnapshot = document.getElementById('payment-method').value;
+    const paidAmountSnapshot    = document.getElementById('paid-amount').value;
+    const deliveryPriceSnapshot = document.getElementById('delivery-price').value;
+    const discountAmountSnapshot= document.getElementById('discount-amount').value;
+    const totalQtySnapshot      = document.getElementById('total-qty').value;
+    const totalAmountSnapshot   = document.getElementById('total-amount').value;
+    const totalVatSnapshot      = document.getElementById('total-vat').value;
+    const totalSumSnapshot      = document.getElementById('total-sum').value;
+    const totalAfterDiscSnapshot= document.getElementById('total-after-discount').value;
+    const totalWithDelivSnapshot= document.getElementById('total-with-delivery').value;
+    const remainingSnapshot     = document.getElementById('remaining-amount').value;
+
+    // ══════════════════════════════════════════════════════════════
+    // ✅ إظهار اللودنج — فقط لهذا الجزء
+    // ══════════════════════════════════════════════════════════════
+    const overlay = createLoadingOverlay('جاري حفظ الفاتورة...');
+    document.body.appendChild(overlay);
+
+    let billNumber = '';
+    let invoiceSavedSuccessfully = false;
+
+    try {
+        // ═══════════════════════════════════════════════════════════
+        // المرحلة 1: جلب رقم الفاتورة (داخل اللودنج)
+        // ═══════════════════════════════════════════════════════════
         try {
             const billRes = await fetch(`${BILLS_SHEET_URL}?action=getNextBillPreview&branch=MCT`);
             const billData = await billRes.json();
             if (billData.status === "success" && billData.BillNo) {
                 billNumber = billData.BillNo;
-                currentBillNumber = billNumber;
-                document.getElementById('invoice-number').innerText = currentBillNumber;
             } else {
-                throw new Error('فشل في جلب رقم الفاتورة');
+                throw new Error('فشل جلب رقم الفاتورة');
             }
         } catch (err) {
-            console.error('❌ خطأ في جلب رقم الفاتورة:', err);
+            console.warn('⚠️ فشل جلب الرقم، استخدام رقم مؤقت');
             billNumber = 'TMP-' + Date.now();
-            currentBillNumber = billNumber;
-            document.getElementById('invoice-number').innerText = currentBillNumber;
         }
-        
-        // ===== 2. حساب تحديثات المنتجات =====
-        const productUpdates = [];
-        for (const item of cartItems) {
-            const product = productsData.find(p => p.id == item.id);
-            if (!product) continue;
-            
-            const qty = item.qty;
-            const price = item.purchasePrice || 0;
-            const vat = item.vatPrice || 0;
-            const totalPrice = price + vat;
-            
-            const newStock = (product.stock || 0) - qty;
-            const newSpent = (product.spent || 0) + qty;
-            const newTotalSales = newSpent * totalPrice;
-            const newSales = newStock * totalPrice;
-            const newBenefits = newTotalSales - newSales;
-            
-            productUpdates.push({
-                id: item.id,
-                ProdStock: newStock,
-                ProdSpent: newSpent,
-                ProdTotalSales: newTotalSales,
-                ProdSales: newSales,
-                ProdBenefits: newBenefits,
-                ProdPrice: price,
-                'ProdVat%': product['ProdVat%'] || 0,
-                ProdVatP: vat,
-                'ProdPrice&vat': totalPrice
-            });
-        }
-        
-        // ===== 3. تجهيز بيانات الفاتورة =====
+
+        currentBillNumber = billNumber;
+        document.getElementById('invoice-number').innerText = currentBillNumber;
+
+        // ═══════════════════════════════════════════════════════════
+        // المرحلة 2: حفظ الفاتورة في Sheets (داخل اللودنج)
+        // ═══════════════════════════════════════════════════════════
         const invoiceData = prepareInvoiceData('addBillWithAutoNumber');
         invoiceData.BillNo = billNumber;
-        
-        invoiceData.BillStock = productUpdates.map(p => p.ProdStock).join(',');
-        invoiceData.BillSpent = productUpdates.map(p => p.ProdSpent).join(',');
-        invoiceData.BillTotalSales = productUpdates.map(p => p.ProdTotalSales.toFixed(3)).join(',');
-        invoiceData.BillSales = productUpdates.map(p => p.ProdSales.toFixed(3)).join(',');
-        invoiceData.BillBenefits = productUpdates.map(p => p.ProdBenefits.toFixed(3)).join(',');
-        
-        // ===== 4. حفظ الفاتورة في الخلفية =====
+
         const params = new URLSearchParams(invoiceData);
         const url = `${BILLS_SHEET_URL}?${params.toString()}`;
-        
-        const response = await fetch(url, {
-            method: 'GET',
-            mode: 'cors'
-        });
+        const response = await fetch(url, { method: 'GET', mode: 'cors' });
         const result = await response.json();
-        
-        if (result.status === 'success') {
-            console.log('✅ تم حفظ الفاتورة رقم', billNumber);
-        } else {
-            console.error('❌ فشل حفظ الفاتورة:', result.message);
+
+        // نقطة الحسم
+        if (result.status !== 'success') {
+            throw new Error(result.message || 'فشل حفظ الفاتورة في السيرفر');
         }
-        
-        // ===== 5. ===== حفظ الفاتورة في LocalStorage =====
-        const lastInvoiceData = {
-            BillNo: billNumber,
-            savedAt: new Date().toISOString(),
-            cartItems: JSON.parse(JSON.stringify(cartItems)),
-            customerName: document.getElementById('customer-name').value || 'نقدي',
-            customerPhone: document.getElementById('customer-phone').value || '',
-            customerLocation: document.getElementById('customer-location').value || '',
-            paymentMethod: document.getElementById('payment-method').value,
-            paidAmount: document.getElementById('paid-amount').value,
-            deliveryPrice: document.getElementById('delivery-price').value,
-            totalQty: document.getElementById('total-qty').value,
-            totalAmount: document.getElementById('total-amount').value,
-            totalVat: document.getElementById('total-vat').value,
-            totalWithVat: document.getElementById('total-sum').value,
-            totalWithDelivery: document.getElementById('total-with-delivery').value,
-            remainingAmount: document.getElementById('remaining-amount').value
-        };
-        saveLastInvoice(lastInvoiceData);
-        
-        // ===== 6. تحديث المنتجات في الخلفية =====
-        if (productUpdates.length > 0) {
-            try {
-                const updateParams = new URLSearchParams();
-                updateParams.append('action', 'updateProductsFromInvoice');
-                updateParams.append('products', JSON.stringify(productUpdates));
-                updateParams.append('sheetId', PRODUCT_SHEET_ID);
-                updateParams.append('sheetName', PRODUCT_SHEET_NAME);
-                
-                const updateUrl = PRODUCTS_SCRIPT_URL + '?' + updateParams.toString();
-                fetch(updateUrl, {
-                    method: 'GET',
-                    mode: 'cors'
-                }).then(response => response.json())
-                  .then(result => {
-                      if (result.status === 'success') {
-                          console.log('✅ تم تحديث المنتجات في الخلفية');
-                      }
-                  })
-                  .catch(err => console.error('❌ خطأ في تحديث المنتجات:', err));
-            } catch (err) {
-                console.error('❌ خطأ في تحديث المنتجات:', err);
-            }
-        }
-        
-        // ===== 7. تحديث بيانات الزبون (عدد مرات الشراء وإجمالي المبلغ) =====
-        await updateCustomerPurchaseStats();
-        
-        // ===== 8. تحديث البيانات محلياً =====
-        productUpdates.forEach(update => {
-            const product = productsData.find(p => p.id == update.id);
-            if (product) {
-                product.stock = update.ProdStock;
-                product.spent = update.ProdSpent;
-                product.ProdTotalSales = update.ProdTotalSales;
-                product.ProdSales = update.ProdSales;
-                product.ProdBenefits = update.ProdBenefits;
-            }
-        });
-        
-        lastSavedCart = JSON.parse(JSON.stringify(cartItems));
-        
-        // ===== 9. إخفاء أيقونة التحميل =====
-        setTimeout(() => {
-            overlay.remove();
-        }, 300);
-        
-        // ===== 10. عرض رسالة النجاح =====
-        showToast(`✅ تم حفظ الفاتورة رقم ${billNumber}`, 'success');
-        
-        // ===== 11. تحديث الأزرار =====
+
+        invoiceSavedSuccessfully = true;
+        console.log('✅ تم حفظ الفاتورة رقم', billNumber);
+
+        // ═══════════════════════════════════════════════════════════
+        // ✅ إخفاء اللودنج + إظهار النجاح + تفعيل الطباعة
+        // من هنا وطالع كل شيء في الخلفية
+        // ═══════════════════════════════════════════════════════════
+        overlay.remove();
+
+        showToast(`✅ تم حفظ الفاتورة رقم ${billNumber} بنجاح`, 'success');
+        if (paymentMethodSnapshot === 'Cash') openCashDrawer();
         document.getElementById('btn-print').disabled = false;
         document.getElementById('btn-preview').disabled = false;
-        
-        // ===== 12. طباعة الفاتورة تلقائياً =====
+
+        // ═══════════════════════════════════════════════════════════
+        // 🚀 من هنا → كل العمليات في الخلفية (Fire & Forget)
+        // ═══════════════════════════════════════════════════════════
+        processInvoiceInBackground({
+            billNumber,
+            cartSnapshot,
+            customerNameSnapshot,
+            customerPhoneSnapshot,
+            customerLocSnapshot,
+            paymentMethodSnapshot,
+            paidAmountSnapshot,
+            deliveryPriceSnapshot,
+            discountAmountSnapshot,
+            totalQtySnapshot,
+            totalAmountSnapshot,
+            totalVatSnapshot,
+            totalSumSnapshot,
+            totalAfterDiscSnapshot,
+            totalWithDelivSnapshot,
+            remainingSnapshot
+        });
+
+        // ═══════════════════════════════════════════════════════════
+        // طباعة تلقائية (لا تحتاج لودنج)
+        // ═══════════════════════════════════════════════════════════
         setTimeout(() => {
             printInvoice();
         }, 500);
-        
-        // ===== 13. تصفية الكاشير بعد الطباعة =====
+
+        // ═══════════════════════════════════════════════════════════
+        // تصفية الكاشير بعد الطباعة
+        // ═══════════════════════════════════════════════════════════
         setTimeout(() => {
             clearCashier();
-            showToast('🧹 تم تصفية الكاشير - يمكنك طباعة الفاتورة مرة أخرى من زر "إعادة الطباعة"', 'info');
+            showToast('🧹 تم تصفية الكاشير', 'info');
         }, 1500);
-        
-        // ===== 14. تحديث قائمة الفواتير في الخلفية =====
-        if (currentUser && currentUser.adminBills === 'TRUE') {
-            setTimeout(() => loadBills(), 2000);
-        }
-        
-        // ===== 15. إعادة تحميل المنتجات والزبائن في الخلفية =====
-        setTimeout(() => {
-            fetchProducts();
-            fetchCustomers();
-        }, 2500);
-        
+
     } catch (err) {
+        // ❌ فشل في المرحلة 1 أو 2 → إلغاء كامل
         overlay.remove();
-        if (err.name === "AbortError") { 
-            showToast("⏱️ انتهت مهلة الاتصال، حاول مرة أخرى", "error"); 
-        } else {
-            showToast("❌ خطأ في الاتصال: " + err.message, "error");
-        }
-        console.error('❌ خطأ في saveInvoice:', err);
+
+        console.error('❌ فشل حفظ الفاتورة:', err);
+
+        showToast(
+            `❌ فشل حفظ الفاتورة: ${err.message}\n📌 لم يتم إجراء أي تعديل على المخزون`,
+            'error',
+            5000
+        );
+
+        const saveBtn = document.querySelector('button[onclick*="saveInvoice"]');
+        if (saveBtn) saveBtn.disabled = false;
+
+        document.getElementById('invoice-number').innerText = '';
+        currentBillNumber = '';
     }
 }
+
+
+// ===================================================================
+// معالجة الفاتورة في الخلفية (بدون تعطيل المستخدم)
+// المراحل 3 → 8
+// ===================================================================
+async function processInvoiceInBackground(data) {
+    const {
+        billNumber,
+        cartSnapshot,
+        customerNameSnapshot,
+        customerPhoneSnapshot,
+        customerLocSnapshot,
+        paymentMethodSnapshot,
+        paidAmountSnapshot,
+        deliveryPriceSnapshot,
+        discountAmountSnapshot,
+        totalQtySnapshot,
+        totalAmountSnapshot,
+        totalVatSnapshot,
+        totalSumSnapshot,
+        totalAfterDiscSnapshot,
+        totalWithDelivSnapshot,
+        remainingSnapshot
+    } = data;
+
+    // ═══════════════════════════════════════════════════════════
+    // المرحلة 3: حساب تحديثات المنتجات (في الذاكرة فقط)
+    // ═══════════════════════════════════════════════════════════
+    const productUpdates = [];
+    for (const item of cartSnapshot) {
+        const product = productsData.find(p => p.id == item.id);
+        if (!product) {
+            console.warn('⚠️ منتج غير موجود:', item.id);
+            continue;
+        }
+
+        const qty = item.qty;
+        const price = item.purchasePrice || 0;
+        const vat = item.vatPrice || 0;
+        const totalPrice = price + vat;
+
+        const newStock       = (product.stock || 0) - qty;
+        const newSpent       = (product.spent || 0) + qty;
+        const newTotalSales  = newSpent * totalPrice;
+        const newSales       = newStock * totalPrice;
+        const newBenefits    = newTotalSales - newSales;
+
+        productUpdates.push({
+            id: item.id,
+            ProdStock: newStock,
+            ProdSpent: newSpent,
+            ProdTotalSales: newTotalSales,
+            ProdSales: newSales,
+            ProdBenefits: newBenefits,
+            ProdPrice: price,
+            'ProdVat%': product['ProdVat%'] || 0,
+            ProdVatP: vat,
+            'ProdPrice&vat': totalPrice
+        });
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // المرحلة 4: إرسال تحديثات المنتجات (في الخلفية)
+    // ═══════════════════════════════════════════════════════════
+    let productsUpdateSucceeded = true;
+    if (productUpdates.length > 0) {
+        try {
+            const updateParams = new URLSearchParams();
+            updateParams.append('action', 'updateProductsFromInvoice');
+            updateParams.append('products', JSON.stringify(productUpdates));
+            updateParams.append('sheetId', PRODUCT_SHEET_ID);
+            updateParams.append('sheetName', PRODUCT_SHEET_NAME);
+
+            const updateUrl = PRODUCTS_SCRIPT_URL + '?' + updateParams.toString();
+            const updateResponse = await fetch(updateUrl, { method: 'GET', mode: 'cors' });
+            const updateResult = await updateResponse.json();
+
+            if (updateResult.status === 'success') {
+                console.log('✅ [خلفية] تم تحديث المنتجات في السيرفر');
+            } else {
+                productsUpdateSucceeded = false;
+                console.error('⚠️ [خلفية] فشل تحديث المنتجات:', updateResult.message);
+            }
+        } catch (err) {
+            productsUpdateSucceeded = false;
+            console.error('⚠️ [خلفية] خطأ في تحديث المنتجات:', err);
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // المرحلة 5: التحديث المحلي للذاكرة
+    // ═══════════════════════════════════════════════════════════
+    productUpdates.forEach(update => {
+        const product = productsData.find(p => p.id == update.id);
+        if (product) {
+            product.stock = update.ProdStock;
+            product.spent = update.ProdSpent;
+            product.ProdTotalSales = update.ProdTotalSales;
+            product.ProdSales = update.ProdSales;
+            product.ProdBenefits = update.ProdBenefits;
+        }
+    });
+
+    // ═══════════════════════════════════════════════════════════
+    // المرحلة 6: تحديث إحصائيات الزبون (في الخلفية)
+    // ═══════════════════════════════════════════════════════════
+    try {
+        await updateCustomerPurchaseStatsInBackground(
+            customerNameSnapshot,
+            customerPhoneSnapshot,
+            parseFloat(totalWithDelivSnapshot) || 0
+        );
+    } catch (err) {
+        console.warn('⚠️ [خلفية] فشل تحديث إحصائيات الزبون:', err);
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // المرحلة 7: الحفظ في localStorage
+    // ═══════════════════════════════════════════════════════════
+    const lastInvoiceData = {
+        BillNo: billNumber,
+        savedAt: new Date().toISOString(),
+        cartItems: cartSnapshot,
+        customerName: customerNameSnapshot,
+        customerPhone: customerPhoneSnapshot,
+        customerLocation: customerLocSnapshot,
+        paymentMethod: paymentMethodSnapshot,
+        paidAmount: paidAmountSnapshot,
+        deliveryPrice: deliveryPriceSnapshot,
+        discountAmount: discountAmountSnapshot,
+        totalQty: totalQtySnapshot,
+        totalAmount: totalAmountSnapshot,
+        totalVat: totalVatSnapshot,
+        totalWithVat: totalSumSnapshot,
+        totalAfterDiscount: totalAfterDiscSnapshot,
+        totalWithDelivery: totalWithDelivSnapshot,
+        remainingAmount: remainingSnapshot
+    };
+    saveLastInvoice(lastInvoiceData);
+
+    // ═══════════════════════════════════════════════════════════
+    // المرحلة 8: تحديث lastSavedCart
+    // ═══════════════════════════════════════════════════════════
+    lastSavedCart = JSON.parse(JSON.stringify(cartSnapshot));
+
+    // ═══════════════════════════════════════════════════════════
+    // إشعار في حالة فشل تحديث المخزون
+    // ═══════════════════════════════════════════════════════════
+    if (!productsUpdateSucceeded) {
+        showToast(
+            `⚠️ الفاتورة ${billNumber} محفوظة لكن تعذّر تحديث المخزون — يرجى التحديث اليدوي`,
+            'warning',
+            4000
+        );
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // تحديث القوائم في الخلفية (اختياري)
+    // ═══════════════════════════════════════════════════════════
+    if (currentUser && currentUser.adminBills === 'TRUE') {
+        setTimeout(() => loadBills(), 2000);
+    }
+    setTimeout(() => {
+        fetchProducts();
+        fetchCustomers();
+    }, 2500);
+}
+
 
 function updatePrintButtonVisibility() {
     const printBtn = document.getElementById('btn-print');
@@ -5245,11 +5550,6 @@ async function updateCustomerPurchaseStats() {
 
 
 function printInvoice() {
-    // ===== التحقق من صلاحية الطباعة =====
-    if (!currentUser || currentUser.adminUsers !== 'TRUE') {
-        showToast('⚠️ ليس لديك صلاحية للطباعة', 'warning');
-        return;
-    }
     
     if (cartItems.length === 0) { 
         showToast('⚠️ لا توجد منتجات للطباعة', 'warning'); 
@@ -5275,6 +5575,11 @@ function printInvoice() {
     const totalWithDelivery = parseFloat(document.getElementById('total-with-delivery').value) || 0;
     const paidAmount = parseFloat(document.getElementById('paid-amount').value) || 0;
     const remainingAmount = parseFloat(document.getElementById('remaining-amount').value) || 0;
+    
+    // ✅ جديد: قراءة حقلي التخفيض والإجمالي بعد التخفيض
+    const discountAmount = parseFloat(document.getElementById('discount-amount').value) || 0;
+    const totalAfterDiscount = parseFloat(document.getElementById('total-after-discount').value) || 0;
+    
     const customerName = document.getElementById('customer-name').value || 'نقدي';
     const customerPhone = document.getElementById('customer-phone').value || '-';
     const customerLocation = document.getElementById('customer-location').value || '-';
@@ -5491,6 +5796,32 @@ function printInvoice() {
                     color: ${remainingAmount <= 0.001 ? '#28a745' : '#dc3545'};
                 }
                 
+                /* ✅ جديد: تنسيق حقل التخفيض */
+                .summary-item.discount-item {
+                    background: #fff3e0;
+                    border-radius: 6px;
+                    padding: 6px 4px;
+                    border: 1px solid #ffb74d;
+                }
+                .summary-item.discount-item .label,
+                .summary-item.discount-item .value {
+                    color: #e65100;
+                }
+                
+                /* ✅ جديد: تنسيق حقل الإجمالي بعد التخفيض */
+                .summary-item.after-discount-item {
+                    background: linear-gradient(135deg, #0d47a1, #1976d2);
+                    border-radius: 6px;
+                    padding: 8px 4px;
+                }
+                .summary-item.after-discount-item .label {
+                    color: rgba(255,255,255,0.9);
+                }
+                .summary-item.after-discount-item .value {
+                    color: white;
+                    font-size: 16px;
+                }
+                
                 /* ===== حالة الدفع ===== */
                 .status-badge {
                     display: inline-block;
@@ -5637,6 +5968,19 @@ function printInvoice() {
                         <span class="label">المجموع + الضريبة</span>
                         <span class="value">${totalWithVat.toFixed(3)}</span>
                     </div>
+                    
+                    <!-- ✅ جديد: حقل التخفيض -->
+                    <div class="summary-item discount-item">
+                        <span class="label">🎁 التخفيض</span>
+                        <span class="value">- ${discountAmount.toFixed(3)}</span>
+                    </div>
+                    
+                    <!-- ✅ جديد: حقل الإجمالي بعد التخفيض -->
+                    <div class="summary-item after-discount-item">
+                        <span class="label">💰 الإجمالي بعد التخفيض</span>
+                        <span class="value">${totalAfterDiscount.toFixed(3)} ر.س</span>
+                    </div>
+                    
                     <div class="summary-item">
                         <span class="label">التوصيل</span>
                         <span class="value">${deliveryPrice.toFixed(3)}</span>
@@ -5695,11 +6039,6 @@ function printInvoice() {
 }
 
 function printPreview() {
-    // ===== التحقق من صلاحية الطباعة =====
-    if (!currentUser || currentUser.adminUsers !== 'TRUE') {
-        showToast('⚠️ ليس لديك صلاحية للطباعة', 'warning');
-        return;
-    }
     
     if (cartItems.length === 0) { 
         showToast('⚠️ لا توجد منتجات للطباعة', 'warning'); 
@@ -5709,7 +6048,9 @@ function printPreview() {
     printInvoice();
 }
 
-                   function showProductsPopup() {
+
+
+    function showProductsPopup() {
     if (!isProductsLoaded) {
         showToast('⏳ جاري تحميل المنتجات...', 'warning');
         fetchProducts();
@@ -5976,20 +6317,21 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-  function renderPopupProducts(products) {
+function renderPopupProducts(products) {
     const tbody = document.getElementById('popup-products-table-body');
     if (!tbody) return;
     if (!products || products.length === 0) {
         tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:20px;">🚫 لا توجد نتائج</td></tr>`;
         return;
     }
-    tbody.innerHTML = '';
+
+    let rowsHtml = '';
     products.forEach((p, idx) => {
-        const stockColor = p.stock <= 0 ? 'style="background:#ffe6e6;"' : '';
+        const stockAttr = p.stock <= 0 ? 'style="background:#ffe6e6;"' : '';
         const sellPrice = p.price || p.purchasePrice || 0;
         const vatAmount = p.vatPrice || 0;
-        tbody.innerHTML += `
-            <tr ${stockColor}>
+        rowsHtml += `
+            <tr ${stockAttr}>
                 <td style="padding:8px;text-align:center;">${idx + 1}</td>
                 <td style="padding:8px;text-align:center;">${p.barcode || '-'}</td>
                 <td style="padding:8px;text-align:center;">${p.section || '-'}</td>
@@ -6005,6 +6347,8 @@ document.addEventListener('DOMContentLoaded', function() {
             </tr>
         `;
     });
+
+    tbody.innerHTML = rowsHtml; // كتابة واحدة فقط بدل 1000 كتابة
 }
 
 // ============================================================
@@ -6124,6 +6468,14 @@ function focusBarcodeInput() {
                             const paidInput = document.getElementById('delivery-price');
                             if (paidInput) { paidInput.focus(); setTimeout(() => { paidInput.select(); }, 50); }
                         }
+                        if (e.ctrlKey && key === 'Digit3') {
+    e.preventDefault();
+    const discountInput = document.getElementById('discount-amount');
+    if (discountInput) { 
+        discountInput.focus(); 
+        setTimeout(() => { discountInput.select(); }, 50); 
+    }
+}
                     });
 
 
@@ -6144,6 +6496,11 @@ function saveLastInvoice(invoiceData) {
             paymentMethod: invoiceData.paymentMethod || 'Cash',
             paidAmount: parseFloat(invoiceData.paidAmount) || 0,
             deliveryPrice: parseFloat(invoiceData.deliveryPrice) || 0,
+            
+            // ===== الحقول الجديدة للتخفيض =====
+            discountAmount: parseFloat(invoiceData.discountAmount) || 0,
+            totalAfterDiscount: parseFloat(invoiceData.totalAfterDiscount) || 0,
+            
             totalQty: parseFloat(invoiceData.totalQty) || 0,
             totalAmount: parseFloat(invoiceData.totalAmount) || 0,
             totalVat: parseFloat(invoiceData.totalVat) || 0,
@@ -6154,6 +6511,7 @@ function saveLastInvoice(invoiceData) {
         
         localStorage.setItem('lastInvoice', JSON.stringify(dataToSave));
         console.log('✅ تم حفظ الفاتورة الجديدة في التخزين المحلي:', dataToSave.BillNo);
+        console.log('💰 التخفيض:', dataToSave.discountAmount, '| الإجمالي بعد التخفيض:', dataToSave.totalAfterDiscount);
         
         // تحديث واجهة المستخدم
         checkLastInvoice();
@@ -6176,6 +6534,11 @@ function getLastInvoice() {
                 ...parsed,
                 paidAmount: parseFloat(parsed.paidAmount) || 0,
                 deliveryPrice: parseFloat(parsed.deliveryPrice) || 0,
+                
+                // ===== الحقول الجديدة للتخفيض =====
+                discountAmount: parseFloat(parsed.discountAmount) || 0,
+                totalAfterDiscount: parseFloat(parsed.totalAfterDiscount) || 0,
+                
                 totalQty: parseFloat(parsed.totalQty) || 0,
                 totalAmount: parseFloat(parsed.totalAmount) || 0,
                 totalVat: parseFloat(parsed.totalVat) || 0,
@@ -6224,6 +6587,15 @@ function showLastInvoiceModal() {
     updateLastInvoiceContent(lastInvoice);
 }
 
+// إغلاق نافذة آخر فاتورة
+function closeLastInvoiceModal() {
+    document.getElementById('lastInvoiceModal').style.display = 'none';
+}
+
+function showLastInvoiceInfo() {
+    showLastInvoiceModal();
+}
+
 // طباعة الفاتورة المحفوظة
 // ===================================================================
 // طباعة آخر فاتورة وإغلاق النافذة بعد الطباعة
@@ -6258,6 +6630,10 @@ function printLastInvoice() {
     const totalWithDelivery = parseFloat(lastInvoice.totalWithDelivery) || 0;
     const paidAmount = parseFloat(lastInvoice.paidAmount) || 0;
     const remainingAmount = parseFloat(lastInvoice.remainingAmount) || 0;
+    
+    // ===== الحقول الجديدة للتخفيض =====
+    const discountAmount = parseFloat(lastInvoice.discountAmount) || 0;
+    const totalAfterDiscount = parseFloat(lastInvoice.totalAfterDiscount) || totalWithDelivery;
     
     const selectedPaymentMethod = lastInvoice.paymentMethod || 'غير محدد';
     const now = new Date();
@@ -6417,6 +6793,25 @@ function printLastInvoice() {
                     font-weight: bold; 
                 }
                 
+                /* ===== حقل التخفيض (جديد) ===== */
+                .summary-line.discount-row {
+                    background: #fff3e0;
+                    padding: 4px 6px;
+                    border-radius: 4px;
+                    color: #e65100;
+                    border: 1px dashed #ffb74d;
+                }
+                
+                /* ===== الإجمالي بعد التخفيض (جديد) ===== */
+                .summary-line.final-row {
+                    background: #e3f2fd;
+                    padding: 6px 8px;
+                    border-radius: 4px;
+                    color: #0d47a1;
+                    border: 2px solid #64b5f6;
+                    font-size: 13px;
+                }
+                
                 /* ===== الفوتر ===== */
                 .footer { 
                     text-align: center; 
@@ -6501,7 +6896,20 @@ function printLastInvoice() {
                     <div class="summary-line vat-row"><span>إجمالي الضريبة:</span><span>${totalVat.toFixed(3)} ر.س</span></div>
                     <div class="summary-line"><span>المجموع مع الضريبة:</span><span>${totalWithVat.toFixed(3)} ر.س</span></div>
                     <div class="summary-line vat-row"><span>مبلغ التوصيل:</span><span>${deliveryPrice.toFixed(3)} ر.س</span></div>
-                    <div class="summary-line total-line"><span>الإجمالي النهائي:</span><span>${totalWithDelivery.toFixed(3)} ر.س</span></div>
+                    <div class="summary-line"><span>الإجمالي قبل التخفيض:</span><span>${totalWithDelivery.toFixed(3)} ر.س</span></div>
+                    
+                    <!-- ===== حقل التخفيض (جديد) ===== -->
+                    <div class="summary-line discount-row">
+                        <span>🎁 التخفيض:</span>
+                        <span>- ${discountAmount.toFixed(3)} ر.س</span>
+                    </div>
+                    
+                    <!-- ===== الإجمالي بعد التخفيض (جديد) ===== -->
+                    <div class="summary-line final-row total-line">
+                        <span>💰 الإجمالي بعد التخفيض:</span>
+                        <span>${totalAfterDiscount.toFixed(3)} ر.س</span>
+                    </div>
+                    
                     <div class="summary-line"><span>طريقة الدفع:</span><span>${selectedPaymentMethod}</span></div>
                     <div class="summary-line"><span>المدفوع:</span><span>${paidAmount.toFixed(3)} ر.س</span></div>
                     <div class="summary-line"><span>الباقي:</span><span>${remainingAmount.toFixed(3)} ر.س</span></div>
@@ -6531,6 +6939,7 @@ function printLastInvoice() {
     }
 }
 
+
 // ===================================================================
 // تحديث محتوى نافذة آخر فاتورة
 // ===================================================================
@@ -6556,10 +6965,14 @@ function updateLastInvoiceContent(invoice) {
     const paidAmount = parseFloat(invoice.paidAmount) || 0;
     const remainingAmount = parseFloat(invoice.remainingAmount) || 0;
     
+    // ===== الحقول الجديدة للتخفيض =====
+    const discountAmount = parseFloat(invoice.discountAmount) || 0;
+    const totalAfterDiscount = parseFloat(invoice.totalAfterDiscount) || totalWithDelivery;
+    
     // تحديث معلومات رأس النافذة
     document.getElementById('lastInvoiceDate').textContent = formattedDate;
     document.getElementById('lastInvoiceNumber').textContent = `رقم: ${invoice.BillNo || 'غير محدد'}`;
-    document.getElementById('lastInvoiceTotal').textContent = `${totalWithDelivery.toFixed(3)} ر.س`;
+    document.getElementById('lastInvoiceTotal').textContent = `${totalAfterDiscount.toFixed(3)} ر.س`;
     
     // تحديد حالة الدفع
     let statusBadge = '';
@@ -6670,10 +7083,19 @@ function updateLastInvoiceContent(invoice) {
                 <div style="font-size:0.75rem; color:#6c757d;">مبلغ التوصيل</div>
                 <div style="font-size:1.1rem; font-weight:bold; color:#1e2a5a;">${deliveryPrice.toFixed(3)}</div>
             </div>
-            <div style="text-align:center; padding:8px; background:linear-gradient(135deg,#1e2a5a,#2a3a7a); border-radius:8px; grid-column: span 2;">
-                <div style="font-size:0.75rem; color:rgba(255,255,255,0.8);">الإجمالي النهائي</div>
-                <div style="font-size:1.4rem; font-weight:bold; color:white;">${totalWithDelivery.toFixed(3)} ر.س</div>
+            
+            <!-- ===== حقل التخفيض (جديد) ===== -->
+            <div style="text-align:center; padding:8px; background:#fff3e0; border-radius:8px; border:1px solid #ffb74d;">
+                <div style="font-size:0.75rem; color:#e65100;">التخفيض</div>
+                <div style="font-size:1.1rem; font-weight:bold; color:#e65100;">${discountAmount.toFixed(3)}</div>
             </div>
+            
+            <!-- ===== الإجمالي بعد التخفيض (جديد) ===== -->
+            <div style="text-align:center; padding:8px; background:linear-gradient(135deg,#1e2a5a,#2a3a7a); border-radius:8px; grid-column: span 2;">
+                <div style="font-size:0.75rem; color:rgba(255,255,255,0.8);">الإجمالي النهائي بعد التخفيض</div>
+                <div style="font-size:1.4rem; font-weight:bold; color:white;">${totalAfterDiscount.toFixed(3)} ر.س</div>
+            </div>
+            
             <div style="text-align:center; padding:8px; background:#f8f9fa; border-radius:8px;">
                 <div style="font-size:0.75rem; color:#6c757d;">المدفوع</div>
                 <div style="font-size:1.1rem; font-weight:bold; color:#28a745;">${paidAmount.toFixed(3)}</div>
@@ -6690,17 +7112,27 @@ function updateLastInvoiceContent(invoice) {
     `;
 }
 
-// ===================================================================
-// إغلاق نافذة آخر فاتورة
-// ===================================================================
-
-function closeLastInvoiceModal() {
-    document.getElementById('lastInvoiceModal').style.display = 'none';
+// التحقق من وجود فاتورة محفوظة وتحديث أزرار الواجهة
+function checkLastInvoice() {
+    const hasInvoice = hasLastInvoice();
+    
+    const btnPrintLast = document.getElementById('btnPrintLast');
+    const btnShowLast = document.getElementById('btnShowLast');
+    
+    if (btnPrintLast) {
+        btnPrintLast.disabled = !hasInvoice;
+        btnPrintLast.style.opacity = hasInvoice ? '1' : '0.5';
+        btnPrintLast.title = hasInvoice ? 'إعادة طباعة آخر فاتورة' : 'لا توجد فاتورة محفوظة';
+    }
+    
+    if (btnShowLast) {
+        btnShowLast.disabled = !hasInvoice;
+        btnShowLast.style.opacity = hasInvoice ? '1' : '0.5';
+        btnShowLast.title = hasInvoice ? 'عرض آخر فاتورة' : 'لا توجد فاتورة محفوظة';
+    }
 }
 
-function showLastInvoiceInfo() {
-    showLastInvoiceModal();
-}
+
 
 // ===================================================================
 // دوال الفواتير
@@ -7329,38 +7761,92 @@ document.querySelectorAll('.btn-print-invoice').forEach(btn => {
 // ===================================================================
 
 function payBillFullAmount() {
-    const totalDelivery = parseFloat(document.getElementById('editTotalDelivery').innerText) || 0;
-    document.getElementById('editAdvance').value = totalDelivery.toFixed(3);
+    // ✅ قراءة الإجمالي النهائي (بعد التخفيض + التوصيل)
+    const totalDelivery = parseFloat(document.getElementById('editTotalDelivery')?.innerText) || 0;
+    
+    // إذا لم يوجد العنصر، نستخدم القيمة المخزنة في dataset
+    const billNo = document.querySelector('#billViewModal button[onclick*="updateBillPayment"]')
+        ?.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
+    
+    let totalFinal = totalDelivery;
+    
+    if (!totalFinal && billNo) {
+        const bill = allBills.find(b => b.BillNo === billNo);
+        if (bill) {
+            totalFinal = parseFloat(bill.BillTotalDelivery) || 0;
+        }
+    }
+    
+    if (totalFinal <= 0) {
+        showToast('⚠️ لا يمكن تحديد الإجمالي', 'warning');
+        return;
+    }
+    
+    // ===== تعيين المدفوع = الإجمالي النهائي =====
+    const advanceInput = document.getElementById('editAdvance');
+    if (advanceInput) {
+        advanceInput.value = totalFinal.toFixed(3);
+    }
+    
+    // ===== إعادة حساب الباقي والحالة =====
     updateBillBalance();
-    showToast('✅ تم تعيين المدفوع كامل المبلغ', 'success');
+    
+    showToast(`✅ تم تعيين المدفوع: ${totalFinal.toFixed(3)} ر.س`, 'success');
 }
 // ===================================================================
 // تحديث الباقي تلقائياً عند تغيير المدفوع
 // ===================================================================
 
 function updateBillBalance() {
-    const totalDelivery = parseFloat(document.getElementById('editTotalDelivery').innerText) || 0;
-    const advance = parseFloat(document.getElementById('editAdvance').value) || 0;
-    const balance = totalDelivery - advance;
+    // قراءة الإجمالي النهائي من الـ badge
+    const totalDeliveryEl = document.getElementById('editTotalDelivery');
+    let totalDelivery = parseFloat(totalDeliveryEl?.innerText) || 0;
     
-    document.getElementById('editBalance').innerText = balance.toFixed(3);
+    // إذا لم يوجد عنصر، نبحث عن الإجمالي في بطاقة "الإجمالي النهائي"
+    if (!totalDelivery) {
+        const finalCard = document.querySelector('#billViewModal div[style*="e8f5e9"] span');
+        if (finalCard) {
+            const text = finalCard.innerText.replace(/[^\d.-]/g, '');
+            totalDelivery = parseFloat(text) || 0;
+        }
+    }
     
-    // تحديث حالة الدفع تلقائياً
+    // قراءة المدفوع
+    const advanceInput = document.getElementById('editAdvance');
+    const advance = parseFloat(advanceInput?.value) || 0;
+    
+    // حساب الباقي
+    const balance = Math.max(0, totalDelivery - advance);
+    
+    // تحديث عرض الباقي
+    const balanceEl = document.getElementById('editBalance');
+    if (balanceEl) {
+        balanceEl.innerText = balance.toFixed(3);
+        balanceEl.style.color = balance <= 0.001 ? '#28a745' : '#dc3545';
+    }
+    
+    // تحديث الحالة
     const statusSelect = document.getElementById('editBillStatus');
     const statusBadge = document.getElementById('editStatusBadge');
     
+    let newStatus = '';
+    let newBadgeClass = '';
+    
     if (balance <= 0.001 && advance > 0) {
-        statusSelect.value = 'مدفوع بالكامل';
-        statusBadge.className = 'badge bg-success text-white';
-        statusBadge.innerText = 'مدفوع بالكامل';
-    } else if (advance > 0.001 && balance > 0.001) {
-        statusSelect.value = 'مدفوع جزئي';
-        statusBadge.className = 'badge bg-warning';
-        statusBadge.innerText = 'مدفوع جزئي';
-    } else if (advance < 0.001) {
-        statusSelect.value = 'غير مدفوع';
-        statusBadge.className = 'badge bg-danger text-white';
-        statusBadge.innerText = 'غير مدفوع';
+        newStatus = 'مدفوع بالكامل';
+        newBadgeClass = 'bg-success text-white';
+    } else if (advance > 0.001) {
+        newStatus = 'مدفوع جزئي';
+        newBadgeClass = 'bg-warning text-dark';
+    } else {
+        newStatus = 'غير مدفوع';
+        newBadgeClass = 'bg-danger text-white';
+    }
+    
+    if (statusSelect) statusSelect.value = newStatus;
+    if (statusBadge) {
+        statusBadge.className = `badge ${newBadgeClass}`;
+        statusBadge.innerText = newStatus;
     }
 }
 
@@ -7433,85 +7919,212 @@ if (!document.getElementById('billAnimations')) {
 // حفظ تعديلات الدفع - مع نافذة تأكيد أمام نافذة التفاصيل
 // ===================================================================
 
+// ===================================================================
+// حفظ تعديلات الدفع - النسخة النهائية مع Debug
+// ===================================================================
 function updateBillPayment(billNo) {
-    const advance = parseFloat(document.getElementById('editAdvance').value) || 0;
-    const paymentMethod = document.getElementById('editPaymentMethod').value;
-    const status = document.getElementById('editBillStatus').value;
-    const totalDelivery = parseFloat(document.getElementById('editTotalDelivery').innerText) || 0;
-    const balance = totalDelivery - advance;
-
-    // إغلاق نافذة التفاصيل مؤقتاً
-    closeBillModal();
-
-    // عرض رسالة تأكيد في نافذة منفصلة
-    const confirmHtml = `
-        <div style="position:fixed; top:0; left:0; width:100%; height:100%; 
-                    background:rgba(0,0,0,0.7); backdrop-filter:blur(8px);
-                    display:flex; justify-content:center; align-items:center;
-                    z-index:100003; padding:20px;">
-            <div style="background:white; border-radius:20px; padding:30px; max-width:450px; width:100%; 
-                        box-shadow:0 20px 60px rgba(0,0,0,0.5); animation:fadeInUp 0.3s ease;">
-                <div style="text-align:center; margin-bottom:20px;">
-                    <i class="fas fa-edit" style="font-size:48px; color:#1e2a5a;"></i>
-                    <h4 style="margin-top:10px; color:#1e2a5a;">تأكيد تحديث الفاتورة</h4>
+    console.log('═══════════════════════════════════════');
+    console.log('💾 بدء حفظ تعديلات الفاتورة:', billNo);
+    
+    // ══════ 1. قراءة قيم الواجهة ══════
+    const advanceInput = document.getElementById('editAdvance');
+    const paymentMethodSelect = document.getElementById('editPaymentMethod');
+    
+    if (!advanceInput) {
+        console.error('❌ حقل editAdvance غير موجود');
+        showToast('⚠️ حقل المدفوع غير موجود', 'error');
+        return;
+    }
+    if (!paymentMethodSelect) {
+        console.error('❌ حقل editPaymentMethod غير موجود');
+        showToast('⚠️ حقل طريقة الدفع غير موجود', 'error');
+        return;
+    }
+    
+    const advance = parseFloat(advanceInput.value) || 0;
+    const paymentMethod = paymentMethodSelect.value || 'Cash';
+    
+    console.log('💰 المدفوع:', advance);
+    console.log('💳 طريقة الدفع:', paymentMethod);
+    
+    // ══════ 2. الحصول على الإجمالي النهائي ══════
+    let totalDelivery = 0;
+    
+    // محاولة 1: من الـ badge الموجود في الملخص
+    const totalSpan = document.getElementById('editTotalDeliveryValue');
+    if (totalSpan) {
+        totalDelivery = parseFloat(totalSpan.innerText.replace(/[^\d.-]/g, '')) || 0;
+        console.log('📊 الإجمالي من editTotalDeliveryValue:', totalDelivery);
+    }
+    
+    // محاولة 2: من بطاقة "الإجمالي النهائي" بلون e8f5e9
+    if (!totalDelivery) {
+        const finalCard = document.querySelector('#billViewModal div[style*="e8f5e9"] span');
+        if (finalCard) {
+            totalDelivery = parseFloat(finalCard.innerText.replace(/[^\d.-]/g, '')) || 0;
+            console.log('📊 الإجمالي من finalCard:', totalDelivery);
+        }
+    }
+    
+    // محاولة 3: من بيانات الفاتورة نفسها
+    if (!totalDelivery) {
+        const bill = allBills.find(b => String(b.BillNo) === String(billNo));
+        if (bill) {
+            totalDelivery = parseFloat(bill.BillTotalDelivery) || 0;
+            console.log('📊 الإجمالي من allBills:', totalDelivery);
+        }
+    }
+    
+    if (totalDelivery <= 0) {
+        console.error('❌ فشل قراءة الإجمالي النهائي');
+        showToast('⚠️ لا يمكن قراءة إجمالي الفاتورة', 'error');
+        return;
+    }
+    
+    console.log('📊 الإجمالي النهائي المستخدم:', totalDelivery);
+    
+    // ══════ 3. الحسابات ══════
+    const balance = Math.max(0, totalDelivery - advance);
+    
+    let status = '';
+    if (balance <= 0.001 && advance > 0) {
+        status = 'مدفوع بالكامل';
+    } else if (advance > 0.001) {
+        status = 'مدفوع جزئي';
+    } else {
+        status = 'غير مدفوع';
+    }
+    
+    console.log('📉 الباقي:', balance);
+    console.log('📋 الحالة المحسوبة:', status);
+    
+    // ══════ 4. التحقق ══════
+    if (advance < 0) {
+        showToast('⚠️ المبلغ المدفوع لا يمكن أن يكون سالباً', 'warning');
+        return;
+    }
+    
+    // ══════ 5. عرض نافذة التأكيد ══════
+    // احذف أي نافذة تأكيد قديمة
+    const oldConfirm = document.getElementById('confirmBillUpdateModal');
+    if (oldConfirm) oldConfirm.remove();
+    
+    const confirmModal = document.createElement('div');
+    confirmModal.id = 'confirmBillUpdateModal';
+    confirmModal.style.cssText = `
+        position:fixed; top:0; left:0; width:100%; height:100%;
+        background:rgba(0,0,0,0.7); backdrop-filter:blur(8px);
+        display:flex; justify-content:center; align-items:center;
+        z-index:100010; padding:20px;
+    `;
+    confirmModal.innerHTML = `
+        <div style="background:white; border-radius:20px; padding:30px; max-width:450px; width:100%;
+                    box-shadow:0 20px 60px rgba(0,0,0,0.5);">
+            <div style="text-align:center; margin-bottom:20px;">
+                <i class="fas fa-edit" style="font-size:48px; color:#1e2a5a;"></i>
+                <h4 style="margin-top:10px; color:#1e2a5a;">تأكيد تحديث الفاتورة</h4>
+            </div>
+            <div style="background:#f8f9fa; border-radius:10px; padding:15px; margin-bottom:20px;">
+                <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #dee2e6;">
+                    <span><strong>رقم الفاتورة:</strong></span>
+                    <span>${billNo}</span>
                 </div>
-                <div style="background:#f8f9fa; border-radius:10px; padding:15px; margin-bottom:20px;">
-                    <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #dee2e6;">
-                        <span><strong>رقم الفاتورة:</strong></span>
-                        <span>${billNo}</span>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #dee2e6;">
-                        <span><strong>الإجمالي النهائي:</strong></span>
-                        <span>${totalDelivery.toFixed(3)} ر.س</span>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #dee2e6;">
-                        <span><strong>المدفوع:</strong></span>
-                        <span style="color:#28a745; font-weight:bold;">${advance.toFixed(3)} ر.س</span>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #dee2e6;">
-                        <span><strong>الباقي:</strong></span>
-                        <span style="color:${balance > 0 ? '#dc3545' : '#28a745'}; font-weight:bold;">${balance.toFixed(3)} ر.س</span>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #dee2e6;">
-                        <span><strong>طريقة الدفع:</strong></span>
-                        <span>${paymentMethod}</span>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; padding:5px 0;">
-                        <span><strong>الحالة:</strong></span>
-                        <span>${status}</span>
-                    </div>
+                <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #dee2e6;">
+                    <span><strong>الإجمالي النهائي:</strong></span>
+                    <span>${totalDelivery.toFixed(3)} ر.س</span>
                 </div>
-                <div style="display:flex; gap:10px; justify-content:center;">
-                    <button onclick="this.closest('div[style]').remove(); viewBill('${billNo}');" 
-                            class="btn btn-secondary" style="padding:10px 25px; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">
-                        <i class="fas fa-times me-2"></i>إلغاء
-                    </button>
-                    <button onclick="confirmUpdateBill('${billNo}')" 
-                            class="btn btn-success" style="padding:10px 25px; border:none; border-radius:8px; cursor:pointer; font-weight:bold; background:#28a745; color:white;">
-                        <i class="fas fa-check me-2"></i>تأكيد الحفظ
-                    </button>
+                <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #dee2e6;">
+                    <span><strong>المدفوع:</strong></span>
+                    <span style="color:#28a745; font-weight:bold;">${advance.toFixed(3)} ر.س</span>
                 </div>
+                <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #dee2e6;">
+                    <span><strong>الباقي:</strong></span>
+                    <span style="color:${balance > 0 ? '#dc3545' : '#28a745'}; font-weight:bold;">${balance.toFixed(3)} ر.س</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #dee2e6;">
+                    <span><strong>طريقة الدفع:</strong></span>
+                    <span>${paymentMethod}</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; padding:5px 0;">
+                    <span><strong>الحالة:</strong></span>
+                    <span style="font-weight:bold;">${status}</span>
+                </div>
+            </div>
+            <div style="display:flex; gap:10px; justify-content:center;">
+                <button id="confirmUpdateCancelBtn" class="btn btn-secondary" style="padding:10px 25px;">
+                    <i class="fas fa-times me-2"></i>إلغاء
+                </button>
+                <button id="confirmUpdateOkBtn" class="btn btn-success" style="padding:10px 25px; background:#28a745; color:white;">
+                    <i class="fas fa-check me-2"></i>تأكيد الحفظ
+                </button>
             </div>
         </div>
     `;
-
-    // إضافة نافذة التأكيد
-    const confirmModal = document.createElement('div');
-    confirmModal.id = 'confirmBillUpdateModal';
-    confirmModal.innerHTML = confirmHtml;
     document.body.appendChild(confirmModal);
-
-    // تخزين البيانات للتأكيد
-    window._pendingBillUpdate = {
-        billNo: billNo,
-        advance: advance,
-        paymentMethod: paymentMethod,
-        status: status,
-        balance: balance,
-        totalDelivery: totalDelivery
-    };
+    
+    // ══════ 6. ربط الأزرار ══════
+    document.getElementById('confirmUpdateCancelBtn').addEventListener('click', function() {
+        console.log('❌ تم إلغاء التحديث');
+        confirmModal.remove();
+    });
+    
+    document.getElementById('confirmUpdateOkBtn').addEventListener('click', async function() {
+        console.log('✅ تم تأكيد التحديث - إرسال للسيرفر...');
+        confirmModal.remove();
+        showLoading();
+        
+        try {
+            const updateData = {
+                action: 'updateBill',
+                BillNo: billNo,
+                BillAdvance: advance.toFixed(3),
+                BillBalance: balance.toFixed(3),
+                BillWay: paymentMethod,
+                BillStatue: status
+            };
+            
+            const params = new URLSearchParams(updateData);
+            const url = `${BILLS_SHEET_URL}?${params.toString()}`;
+            
+            console.log('📤 URL:', url);
+            
+            const response = await fetch(url, { method: 'GET', mode: 'cors' });
+            const result = await response.json();
+            
+            console.log('📥 استجابة السيرفر:', result);
+            
+            hideLoading();
+            
+            if (result.status === 'success') {
+                showToast(`✅ تم تحديث الفاتورة ${billNo} بنجاح`, 'success');
+                
+                // تحديث محلي
+                const bill = allBills.find(b => String(b.BillNo) === String(billNo));
+                if (bill) {
+                    bill.BillAdvance = advance;
+                    bill.BillBalance = balance;
+                    bill.BillWay = paymentMethod;
+                    bill.BillStatue = status;
+                }
+                
+                closeBillModal();
+                
+                if (currentUser && currentUser.adminBills === 'TRUE') {
+                    setTimeout(() => loadBills(), 500);
+                }
+            } else {
+                throw new Error(result.message || 'فشل في تحديث الفاتورة');
+            }
+            
+        } catch (error) {
+            hideLoading();
+            console.error('❌ خطأ في الحفظ:', error);
+            showToast(`❌ ${error.message}`, 'error', 5000);
+        }
+    });
+    
+    console.log('═══════════════════════════════════════');
 }
-
 
 
 // ===================================================================
@@ -7543,18 +8156,14 @@ function updateBillSummary(bills) {
 function viewBill(billNo) {
     console.log('🔍 البحث عن فاتورة برقم:', billNo);
     
-    // البحث باستخدام BillNo
     const bill = allBills.find(b => (b.BillNo || '').toString() === billNo.toString());
     
     if (!bill) {
-        console.log('❌ الفاتورة غير موجودة');
         showToast('⚠️ الفاتورة غير موجودة', 'warning');
         return;
     }
 
-    console.log('✅ تم العثور على الفاتورة:', bill);
-
-    // ===== دالة مساعدة لتحويل البيانات إلى مصفوفة =====
+    // ===== دالة مساعدة =====
     function safeSplit(value) {
         if (!value) return [];
         if (Array.isArray(value)) return value;
@@ -7567,19 +8176,15 @@ function viewBill(billNo) {
         return [String(value)];
     }
 
-    // ===== استخراج المنتجات بأمان =====
-    let products = [];
-    let quantities = [];
-    let prices = [];
-    let amounts = [];
-    let vats = [];
+    // ===== استخراج المنتجات =====
+    let products = [], quantities = [], prices = [], amounts = [], vats = [];
 
     if (bill.BillProducts) {
         const productsRaw = safeSplit(bill.BillProducts);
-        const qtyRaw = safeSplit(bill.BillQNT);
-        const priceRaw = safeSplit(bill.BillPrice);
-        const amountRaw = safeSplit(bill.BillAmount);
-        const vatRaw = safeSplit(bill.BillVat);
+        const qtyRaw      = safeSplit(bill.BillQNT);
+        const priceRaw    = safeSplit(bill.BillPrice);
+        const amountRaw   = safeSplit(bill.BillAmount);
+        const vatRaw      = safeSplit(bill.BillVat);
 
         const maxLen = Math.max(productsRaw.length, qtyRaw.length, priceRaw.length, amountRaw.length, vatRaw.length);
         
@@ -7590,19 +8195,9 @@ function viewBill(billNo) {
             amounts.push(parseFloat(amountRaw[i]) || 0);
             vats.push(parseFloat(vatRaw[i]) || 0);
         }
-    } else if (bill.products && bill.products.length > 0) {
-        bill.products.forEach(p => {
-            if (p.BillProducts) {
-                products.push(p.BillProducts);
-                quantities.push(parseFloat(p.BillQNT) || 0);
-                prices.push(parseFloat(p.BillPrice) || 0);
-                amounts.push(parseFloat(p.BillAmount) || 0);
-                vats.push(parseFloat(p.BillVat) || 0);
-            }
-        });
     }
 
-    // ===== بناء جدول المنتجات =====
+    // ===== جدول المنتجات =====
     let productsHtml = '';
     if (products.length > 0 && products.some(p => p !== '')) {
         productsHtml = `
@@ -7642,27 +8237,34 @@ function viewBill(billNo) {
         productsHtml = '<p class="text-muted text-center">لا توجد منتجات مسجلة</p>';
     }
 
-    // ===== تحديد حالة الفاتورة =====
-    const totalDelivery = parseFloat(bill.BillTotalDelivery) || 0;
-    const advance = parseFloat(bill.BillAdvance) || 0;
-    const balance = totalDelivery - advance;
-    const statusText = bill.BillStatue || 'غير معروف';
+    // ===== قراءة القيم =====
+    const totalWithDelivery   = parseFloat(bill.BillTotalDelivery) || 0;   // الإجمالي النهائي (بعد التخفيض + توصيل)
+    const advance             = parseFloat(bill.BillAdvance) || 0;
+    const balance             = totalWithDelivery - advance;
+    const statusText          = bill.BillStatue || 'غير معروف';
     
-    let statusBadge = '';
-    if (statusText === 'مدفوع بالكامل' || statusText === 'Paid') {
-        statusBadge = 'bg-success text-white';
-    } else if (statusText === 'مدفوع جزئي' || statusText === 'Partial') {
-        statusBadge = 'bg-warning';
-    } else if (statusText === 'غير مدفوع' || statusText === 'Unpaid') {
-        statusBadge = 'bg-danger text-white';
-    } else {
-        statusBadge = 'bg-secondary text-white';
+    // ✅ الحقول الجديدة للتخفيض
+    const discountAmount      = parseFloat(bill.BillTotDiscount) || 0;     // قيمة التخفيض
+    const totalAfterDiscount  = parseFloat(bill.BillTotAMvDIS) || 0;       // الإجمالي بعد التخفيض
+    const totalWithVat        = parseFloat(bill.BillTotAMvVAT) || 0;       // المجموع + الضريبة
+    const deliveryPrice       = parseFloat(bill.BillDelivery) || 0;        // التوصيل
+    
+    // الحالة الحالية (لبدء التعديل)
+    let currentStatus = statusText;
+    if (currentStatus !== 'مدفوع بالكامل' && currentStatus !== 'مدفوع جزئي' && currentStatus !== 'غير مدفوع') {
+        currentStatus = balance <= 0.001 ? 'مدفوع بالكامل' : (advance > 0.001 ? 'مدفوع جزئي' : 'غير مدفوع');
     }
+    
+    // Badge الحالة
+    let statusBadge = 'bg-secondary text-white';
+    if (currentStatus === 'مدفوع بالكامل') statusBadge = 'bg-success text-white';
+    else if (currentStatus === 'مدفوع جزئي') statusBadge = 'bg-warning text-dark';
+    else if (currentStatus === 'غير مدفوع') statusBadge = 'bg-danger text-white';
 
-    // ===== إغلاق أي نافذة مفتوحة سابقاً =====
+    // إغلاق أي نافذة مفتوحة
     closeBillModal();
 
-    // ===== إنشاء النافذة المنبثقة =====
+    // ===== إنشاء النافذة =====
     const modal = document.createElement('div');
     modal.id = 'billViewModal';
     modal.style.cssText = `
@@ -7672,17 +8274,20 @@ function viewBill(billNo) {
         z-index: 100002; padding: 20px;
     `;
     modal.innerHTML = `
-        <div style="background: white; border-radius: 20px; width: 90%; max-width: 800px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+        <div style="background: white; border-radius: 20px; width: 90%; max-width: 900px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            
+            <!-- الرأس -->
             <div style="background: #1e2a5a; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
                 <h4 style="margin: 0;"><i class="fas fa-file-invoice me-2"></i>فاتورة رقم ${bill.BillNo}</h4>
-                <div>
-
-                    <button onclick="closeBillModal()" style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; padding: 0 10px;">&times;</button>
-                </div>
+                <button onclick="closeBillModal()" style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; padding: 0 10px;">&times;</button>
             </div>
+            
+            <!-- المحتوى -->
             <div style="padding: 20px; overflow-y: auto; flex: 1;">
+                
+                <!-- بيانات الفاتورة -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
-                   <div><strong>التاريخ:</strong> ${formatBillDate(bill.BillDate)}</div>
+                    <div><strong>التاريخ:</strong> ${formatBillDate(bill.BillDate)}</div>
                     <div><strong>الكاشير:</strong> ${bill.BillCashair || ''}</div>
                     <div><strong>الزبون:</strong> ${bill.BillCustomer || ''}</div>
                     <div><strong>الهاتف:</strong> ${bill.BillPhone || ''}</div>
@@ -7698,39 +8303,60 @@ function viewBill(billNo) {
                             <option value="Other" ${bill.BillWay === 'Other' ? 'selected' : ''}>أخرى</option>
                         </select>
                     </div>
-                    <div>
-                        <strong>الحالة:</strong>
-                        <select id="editBillStatus" class="form-select form-select-sm" style="display:inline-block; width:auto; margin-right:5px;">
-                            <option value="مدفوع بالكامل" ${statusText === 'مدفوع بالكامل' ? 'selected' : ''}>مدفوع بالكامل</option>
-                            <option value="مدفوع جزئي" ${statusText === 'مدفوع جزئي' ? 'selected' : ''}>مدفوع جزئي</option>
-                            <option value="غير مدفوع" ${statusText === 'غير مدفوع' ? 'selected' : ''}>غير مدفوع</option>
-                        </select>
-                    </div>
+             
                 </div>
+                
                 ${productsHtml}
+                
+                <!-- ملخص الفاتورة -->
                 <div style="margin-top: 15px; padding-top: 15px; border-top: 2px dashed #dee2e6;">
                     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
                         <div><strong>إجمالي المنتجات:</strong> ${bill.BillTotPxQ ? parseFloat(bill.BillTotPxQ).toFixed(3) : '0.000'}</div>
                         <div><strong>إجمالي الضريبة:</strong> ${bill.BillTotVat ? parseFloat(bill.BillTotVat).toFixed(3) : '0.000'}</div>
-                        <div><strong>المجموع مع الضريبة:</strong> ${bill.BillTotAMvVAT ? parseFloat(bill.BillTotAMvVAT).toFixed(3) : '0.000'}</div>
-                        <div><strong>مبلغ التوصيل:</strong> ${bill.BillDelivery ? parseFloat(bill.BillDelivery).toFixed(3) : '0.000'}</div>
-                        <div><strong>الإجمالي النهائي:</strong> <span id="editTotalDelivery">${totalDelivery.toFixed(3)}</span></div>
-                        <div>
+                        <div><strong>المجموع مع الضريبة:</strong> <span style="color:#1e2a5a; font-weight:bold;">${totalWithVat.toFixed(3)}</span></div>
+                        
+                        <!-- ✅ التخفيض -->
+                        <div style="background:#fff3e0; padding:6px 10px; border-radius:6px; border:1px solid #ffb74d;">
+                            <strong style="color:#e65100;">🎁 التخفيض:</strong> 
+                            <span style="color:#e65100; font-weight:bold;">${discountAmount.toFixed(3)}</span>
+                        </div>
+                        
+                        <!-- ✅ الإجمالي بعد التخفيض -->
+                        <div style="background:#e3f2fd; padding:6px 10px; border-radius:6px; border:1px solid #64b5f6; grid-column: span 2;">
+                            <strong style="color:#0d47a1;font-weight:bold; font-size:1.1rem;">💰 الإجمالي بعد التخفيض:</strong> 
+                            <span style="color:#0d47a1; font-weight:bold; font-size:1.1rem;">${totalAfterDiscount.toFixed(3)} ر.س</span>
+                        </div>
+                        
+                        <!-- التوصيل -->
+                          <div style="background:#fff3e0; padding:6px 10px; border-radius:6px; border:1px solid #ffb74d;">
+                            <strong style="color:#e65100;">🎁 التوصيل:</strong> 
+                            <span style="color:#e65100; font-weight:bold;">${deliveryPrice.toFixed(3)}</span>
+                        </div>
+                                <!-- الإجمالي النهائي -->
+                        <div style="background:#e8f5e9; padding:6px 10px; border-radius:6px; border:1px solid #66bb6a; grid-column: span 2;">
+                            <strong style="color:#2e7d32;">📦 الإجمالي النهائي (مع التوصيل):</strong> 
+                            <span style="color:#2e7d32; font-weight:bold; font-size:1.1rem;">${totalWithDelivery.toFixed(3)} ر.س</span>
+                        </div>
+                        
+                        <!-- المدفوع -->
+                        <div style="grid-column: span 3;">
                             <strong>المدفوع:</strong>
-                            <div style="display:flex; align-items:center; gap:5px; margin-top:3px;">
+                            <div style="display:flex; align-items:center; gap:5px; margin-top:5px;">
                                 <input type="number" id="editAdvance" value="${advance.toFixed(3)}" step="0.001" 
-                                       style="width:100px; text-align:center; border:1px solid #ced4da; border-radius:4px; padding:4px 8px;"
+                                       style="width:120px; text-align:center; border:1px solid #ced4da; border-radius:4px; padding:6px 8px;"
                                        oninput="updateBillBalance()">
-                            <button onclick="payBillFullAmount()" class="btn btn-success btn-sm" style="white-space:nowrap; padding:4px 12px;">
-    <i class="fas fa-check-circle"></i> دفع كامل
-</button>
+                                <button onclick="payBillFullAmount()" class="btn btn-success btn-sm" style="white-space:nowrap; padding:6px 14px;">
+                                    <i class="fas fa-check-circle"></i> دفع كامل
+                                </button>
+                                <span style="margin-right:15px;"><strong>الباقي:</strong> <span id="editBalance" style="color:${balance <= 0.001 ? '#28a745' : '#dc3545'}; font-weight:bold;">${balance.toFixed(3)}</span></span>
+                                <span style="margin-right:15px;"><strong>الحالة:</strong> <span id="editStatusBadge" class="badge ${statusBadge}">${currentStatus}</span></span>
                             </div>
                         </div>
-                        <div><strong>الباقي:</strong> <span id="editBalance">${balance.toFixed(3)}</span></div>
-                        <div><strong>الحالة:</strong> <span id="editStatusBadge" class="badge ${statusBadge}">${statusText}</span></div>
                     </div>
                 </div>
             </div>
+            
+            <!-- الأزرار -->
             <div style="padding: 15px; border-top: 1px solid #dee2e6; text-align: center; flex-shrink: 0;">
                 <button onclick="closeBillModal()" class="btn btn-secondary"><i class="fas fa-times me-2"></i>إغلاق</button>
                 <button onclick="updateBillPayment('${bill.BillNo}')" class="btn btn-success"><i class="fas fa-save me-2"></i>حفظ التعديلات</button>
@@ -7742,12 +8368,10 @@ function viewBill(billNo) {
 
     // إغلاق عند الضغط خارج النافذة
     modal.addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeBillModal();
-        }
+        if (e.target === this) closeBillModal();
     });
 
-    // إغلاق عند الضغط على ESC
+    // إغلاق عند ESC
     document.addEventListener('keydown', function closeOnEsc(e) {
         if (e.key === 'Escape') {
             closeBillModal();
@@ -7755,6 +8379,7 @@ function viewBill(billNo) {
         }
     });
 }
+
 
 
 // ===================================================================
@@ -7880,6 +8505,10 @@ function printBill(billNo) {
     const paidAmount = parseFloat(bill.BillAdvance) || 0;
     const remainingAmount = parseFloat(bill.BillBalance) || 0;
 
+    // ===== الحقول الجديدة للتخفيض =====
+    const discountAmount = parseFloat(bill.BillTotDiscount) || 0;
+    const totalAfterDiscount = parseFloat(bill.BillTotAMvDIS) || totalWithDelivery;
+
     const statusText = bill.BillStatue || 'غير معروف';
     let statusClass = 'status-unpaid';
     if (statusText === 'مدفوع بالكامل' || statusText === 'Paid') {
@@ -7998,6 +8627,25 @@ function printBill(billNo) {
                     font-weight: bold; 
                 }
                 
+                /* ===== حقل التخفيض (جديد) ===== */
+                .summary-line.discount-row {
+                    background: #fff3e0;
+                    padding: 4px 6px;
+                    border-radius: 4px;
+                    color: #e65100;
+                    border: 1px dashed #ffb74d;
+                }
+                
+                /* ===== الإجمالي بعد التخفيض (جديد) ===== */
+                .summary-line.final-row {
+                    background: #e3f2fd;
+                    padding: 6px 8px;
+                    border-radius: 4px;
+                    color: #0d47a1;
+                    border: 2px solid #64b5f6;
+                    font-size: 13px;
+                }
+                
                 /* ===== الفوتر ===== */
                 .footer { 
                     text-align: center; 
@@ -8076,7 +8724,20 @@ function printBill(billNo) {
                     <div class="summary-line vat-row"><span>إجمالي الضريبة:</span><span>${totalVat.toFixed(3)} ر.س</span></div>
                     <div class="summary-line"><span>المجموع مع الضريبة:</span><span>${totalWithVat.toFixed(3)} ر.س</span></div>
                     <div class="summary-line vat-row"><span>مبلغ التوصيل:</span><span>${deliveryPrice.toFixed(3)} ر.س</span></div>
-                    <div class="summary-line total-line"><span>الإجمالي النهائي:</span><span>${totalWithDelivery.toFixed(3)} ر.س</span></div>
+                    <div class="summary-line"><span>الإجمالي قبل التخفيض:</span><span>${totalWithDelivery.toFixed(3)} ر.س</span></div>
+                    
+                    <!-- ===== حقل التخفيض (جديد) ===== -->
+                    <div class="summary-line discount-row">
+                        <span>🎁 التخفيض:</span>
+                        <span>- ${discountAmount.toFixed(3)} ر.س</span>
+                    </div>
+                    
+                    <!-- ===== الإجمالي بعد التخفيض (جديد) ===== -->
+                    <div class="summary-line final-row total-line">
+                        <span>💰 الإجمالي بعد التخفيض:</span>
+                        <span>${totalAfterDiscount.toFixed(3)} ر.س</span>
+                    </div>
+                    
                     <div class="summary-line"><span>طريقة الدفع:</span><span>${bill.BillWay || ''}</span></div>
                     <div class="summary-line"><span>المدفوع:</span><span>${paidAmount.toFixed(3)} ر.س</span></div>
                     <div class="summary-line"><span>الباقي:</span><span>${remainingAmount.toFixed(3)} ر.س</span></div>
@@ -8604,6 +9265,10 @@ window.openWindow = function(windowId) {
 
 <!-- ===== دالة طباعة الفاتورة الرسمية - أضفها في قسم الـ JavaScript ===== -->
 
+// ===================================================================
+// دالة طباعة الفاتورة الرسمية - A4
+// ===================================================================
+
 function printInvoiceOfficial(billNo) {
     console.log('🖨️ طباعة فاتورة رسمية رقم:', billNo);
     
@@ -8699,6 +9364,10 @@ function printInvoiceOfficial(billNo) {
     const totalWithDelivery = parseFloat(bill.BillTotalDelivery) || 0;
     const paidAmount = parseFloat(bill.BillAdvance) || 0;
     const remainingAmount = parseFloat(bill.BillBalance) || 0;
+
+    // ===== الحقول الجديدة للتخفيض =====
+    const discountAmount = parseFloat(bill.BillTotDiscount) || 0;
+    const totalAfterDiscount = parseFloat(bill.BillTotAMvDIS) || totalWithDelivery;
 
     const statusText = bill.BillStatue || 'غير معروف';
     let statusClass = 'status-unpaid';
@@ -8893,6 +9562,34 @@ function printInvoiceOfficial(billNo) {
                     color: ${remainingAmount <= 0.001 ? '#28a745' : '#dc3545'};
                 }
                 
+                /* ===== حقل التخفيض (جديد) ===== */
+                .summary-item.discount-item {
+                    background: #fff3e0;
+                    border-radius: 6px;
+                    padding: 6px 4px;
+                    border: 1px solid #ffb74d;
+                }
+                .summary-item.discount-item .label {
+                    color: #e65100;
+                }
+                .summary-item.discount-item .value {
+                    color: #e65100;
+                }
+                
+                /* ===== الإجمالي بعد التخفيض (جديد) ===== */
+                .summary-item.final-item {
+                    background: linear-gradient(135deg, #0d47a1, #1976d2);
+                    border-radius: 6px;
+                    padding: 8px 4px;
+                }
+                .summary-item.final-item .label {
+                    color: rgba(255,255,255,0.9);
+                }
+                .summary-item.final-item .value {
+                    color: white;
+                    font-size: 16px;
+                }
+                
                 /* ===== حالة الدفع ===== */
                 .status-badge {
                     display: inline-block;
@@ -9019,10 +9716,23 @@ function printInvoiceOfficial(billNo) {
                         <span class="label">التوصيل</span>
                         <span class="value">${deliveryPrice.toFixed(3)}</span>
                     </div>
-                    <div class="summary-item" style="grid-column: span 1;">
-                        <span class="label">الإجمالي النهائي</span>
-                        <span class="value total">${totalWithDelivery.toFixed(3)} ر.س</span>
+                    <div class="summary-item">
+                        <span class="label">الإجمالي قبل التخفيض</span>
+                        <span class="value">${totalWithDelivery.toFixed(3)}</span>
                     </div>
+                    
+                    <!-- ===== حقل التخفيض (جديد) ===== -->
+                    <div class="summary-item discount-item">
+                        <span class="label">🎁 التخفيض</span>
+                        <span class="value">${discountAmount.toFixed(3)}</span>
+                    </div>
+                    
+                    <!-- ===== الإجمالي بعد التخفيض (جديد) ===== -->
+                    <div class="summary-item final-item">
+                        <span class="label">💰 الإجمالي بعد التخفيض</span>
+                        <span class="value">${totalAfterDiscount.toFixed(3)} ر.س</span>
+                    </div>
+                    
                     <div class="summary-item">
                         <span class="label">المدفوع</span>
                         <span class="value" style="color:#28a745;">${paidAmount.toFixed(3)}</span>
@@ -9033,20 +9743,21 @@ function printInvoiceOfficial(billNo) {
                     </div>
                 </div>
 
-             <!-- ===== الفوتر مع الختم ===== -->
-<div class="invoice-footer" style="display:flex; justify-content:space-between; align-items:center; margin-top:auto; padding-top:12px; border-top:2px solid #1e2a5a;">
-    <div style="display:flex; flex-direction:column; align-items:center;">
-        <div style="font-size:12px; color:#999;">شكراً لتسوقكم معنا</div>
-        <div style="font-size:10px; color:#aaa;">تم إنشاء هذه الفاتورة بواسطة نظام إدارة المنتجات</div>
-    </div>
-    <div style="display:flex; flex-direction:column; align-items:center;">
-        <!-- صورة الختم -->
-        <img src="${document.getElementById('compFooterPreview')?.src || ''}" 
-             style="max-width:100px; max-height:70px; object-fit:contain; margin-bottom:4px;" />
-        <div style="font-size:12px; font-weight:bold; color:#1e2a5a;">📌 ختم الشركة</div>
-        <div style="font-size:11px; color:#999;">....................</div>
-    </div>
-</div>
+                <!-- ===== الفوتر مع الختم ===== -->
+                <div class="invoice-footer" style="display:flex; justify-content:space-between; align-items:center; margin-top:auto; padding-top:12px; border-top:2px solid #1e2a5a;">
+                    <div style="display:flex; flex-direction:column; align-items:center;">
+                        <div style="font-size:12px; color:#999;">شكراً لتسوقكم معنا</div>
+                        <div style="font-size:10px; color:#aaa;">تم إنشاء هذه الفاتورة بواسطة نظام إدارة المنتجات</div>
+                    </div>
+                    <div style="display:flex; flex-direction:column; align-items:center;">
+                        <!-- صورة الختم -->
+                        <img src="${document.getElementById('compFooterPreview')?.src || ''}" 
+                             style="max-width:100px; max-height:70px; object-fit:contain; margin-bottom:4px;" />
+                        <div style="font-size:12px; font-weight:bold; color:#1e2a5a;">📌 ختم الشركة</div>
+                        <div style="font-size:11px; color:#999;">....................</div>
+                    </div>
+                </div>
+            </div>
             
             <script>
                 window.onload = function() {
@@ -12423,141 +13134,154 @@ document.addEventListener('DOMContentLoaded', function() {
 // حفظ العملية
 async function saveAddTrashOperation() {
     const saveBtn = document.getElementById('saveAddTrashBtn');
-    // تعطيل الزر ومنع النقر المتكرر
     saveBtn.disabled = true;
     saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
     showLoading();
 
     try {
-        // قراءة البيانات من النافذة
-        const productId = document.getElementById('addTrashProductId').value;
+        // ══════ 1. قراءة البيانات من النافذة ══════
+        const productId   = document.getElementById('addTrashProductId').value;
         const operationId = document.getElementById('addTrashID').value;
-        const state = document.getElementById('addTrashState').value;
-        const qty = parseFloat(document.getElementById('addTrashNo').value) || 0;
-        const price = parseFloat(document.getElementById('addTrashPrice').value) || 0;
-        const vatPercent = parseFloat(document.getElementById('addTrashVatPercent').value) || 0;
-        const timestamp = document.getElementById('addTrashTimestamp').value;
+        const state       = document.getElementById('addTrashState').value;
+        const qty         = parseFloat(document.getElementById('addTrashNo').value) || 0;
+        const price       = parseFloat(document.getElementById('addTrashPrice').value) || 0;
+        const vatPercent  = parseFloat(document.getElementById('addTrashVatPercent').value) || 0;
+        const timestamp   = document.getElementById('addTrashTimestamp').value;
 
-        // التحقق من صحة المدخلات
+        // ══════ 2. التحقق ══════
         if (!productId) throw new Error('المنتج غير محدد');
-        if (qty <= 0) throw new Error('العدد يجب أن يكون أكبر من صفر');
+        if (qty <= 0)    throw new Error('العدد يجب أن يكون أكبر من صفر');
 
-        // البحث عن المنتج الحالي
+        // ══════ 3. البحث عن المنتج ══════
         const product = allProducts.find(p => String(p.id) === String(productId));
         if (!product) throw new Error('المنتج غير موجود');
 
-        // قراءة القيم الحالية
-        let currentAvailable = parseFloat(product.ProdAvailable) || 0;
-        let currentStock = parseFloat(product.ProdStock) || 0;
-        let currentSpent = parseFloat(product.ProdSpent) || 0;
-        let currentLastAdd = parseFloat(product.ProdLastAdd) || 0;
-        let currentTotalSales = parseFloat(product.ProdTotalSales) || 0;
-        let currentSales = parseFloat(product.ProdSales) || 0;
-        let currentBenefits = parseFloat(product.ProdBenefits) || 0;
-        let currentPrice = parseFloat(product.ProdPrice) || 0;
-        let currentVatPercent = parseFloat(product['ProdVat%']) || 0;
-        let currentTotalPrice = parseFloat(product['ProdPrice&vat']) || (currentPrice + (currentPrice * (currentVatPercent / 100)));
+        // ══════ 4. قراءة القيم الحالية ══════
+        const currentAvailable  = parseFloat(product.ProdAvailable) || 0;
+        const currentStock      = parseFloat(product.ProdStock) || 0;
+        const currentSpent      = parseFloat(product.ProdSpent) || 0;
+        const currentLastAdd    = parseFloat(product.ProdLastAdd) || 0;
+        const currentTotalSales = parseFloat(product.ProdTotalSales) || 0;
+        const currentSales      = parseFloat(product.ProdSales) || 0;
+        const currentBenefits   = parseFloat(product.ProdBenefits) || 0;
 
-        let newAvailable, newStock, newSpent, newLastAdd, newTotalSales, newSales, newBenefits;
-        let newPrice = price;
-        let newVatPercent = vatPercent;
-        let newTotalPrice = newPrice + (newPrice * (newVatPercent / 100));
+        // ══════ 5. ✅ تعريف القيم الجديدة للسعر والضريبة ══════
+        const newPrice      = price;
+        const newVatPercent = vatPercent;
+        const newVatP       = newPrice * (newVatPercent / 100);
+        const newTotalPrice = newPrice + newVatP;
 
-        // حساب الكميات الجديدة حسب نوع العملية
+        // ══════ 6. حساب القيم الجديدة حسب نوع العملية ══════
+        let newAvailable, newStock, newSpent, newLastAdd;
+        let newTotalSales, newSales, newBenefits;
+
         if (state === 'إضافة') {
-            newAvailable = currentAvailable + qty;
-            newStock = currentStock + qty;
-            newSpent = currentSpent;
-            newLastAdd = qty;
-        } else { // شطب
-            if (currentStock < qty) throw new Error(`المخزون غير كافٍ (المتاح: ${currentStock})`);
-            newAvailable = currentAvailable - qty;
-            newStock = currentStock - qty;
-            newSpent = currentSpent + qty;
-            newLastAdd = currentLastAdd;
-            newPrice = currentPrice;
-            newVatPercent = currentVatPercent;
-            newTotalPrice = currentTotalPrice;
+            // ➕ إضافة مخزون
+            newAvailable  = currentAvailable + qty;
+            newStock      = currentStock + qty;
+            newLastAdd    = currentLastAdd + qty;
+            newSpent      = currentSpent;
+            newTotalSales = currentTotalSales;
+            newSales      = currentSales;
+            newBenefits   = currentBenefits;
+        } else {
+            // ➖ شطب من المخزون
+            if (currentStock < qty) {
+                throw new Error('المخزون غير كافٍ للشطب');
+            }
+            newAvailable  = currentAvailable - qty;
+            newStock      = currentStock - qty;
+            newLastAdd    = currentLastAdd;
+            newSpent      = currentSpent;
+            newTotalSales = currentTotalSales;
+            newSales      = currentSales;
+            newBenefits   = currentBenefits;
         }
 
-        // حساب الأرباح والمبيعات
-        newTotalSales = newSpent * newTotalPrice;
-        newSales = newStock * newTotalPrice;
-        newBenefits = newTotalSales - newSales;
-
-        // حساب الإجمالي (السعر × الكمية) وقيمة الضريبة
-        const totalAmount = newPrice * qty;
-        const vatValue = totalAmount * (newVatPercent / 100);
+        // ══════ 7. حساب الإجمالي للعملية ══════
+        const totalAmount  = newPrice * qty;
+        const vatValue     = totalAmount * (newVatPercent / 100);
         const totalWithVat = totalAmount + vatValue;
 
-        // بناء كائن التحديث للمنتج
+        // ══════ 8. تجهيز بيانات تحديث المنتج ══════
         const updateData = {
             id: productId,
-            ProdSupplier: product.ProdSupplier,
-            ProdSection: product.ProdSection,
-            ProdBarcode: product.ProdBarcode,
-            ProdName: product.ProdName,
-            ProdAvailable: newAvailable,
-            ProdStock: newStock,
-            ProdSpent: newSpent,
-            ProdLastAdd: newLastAdd,
-            ProdPrice: newPrice,
-            'ProdVat%': newVatPercent,
-            ProdVatP: newPrice * (newVatPercent / 100),
+            ProdSupplier:   product.ProdSupplier,
+            ProdSection:    product.ProdSection,
+            ProdBarcode:    product.ProdBarcode,
+            ProdName:       product.ProdName,
+            ProdAvailable:  newAvailable,
+            ProdStock:      newStock,
+            ProdSpent:      newSpent,
+            ProdLastAdd:    newLastAdd,
+            ProdPrice:      newPrice,
+            'ProdVat%':     newVatPercent,
+            ProdVatP:       newVatP,
             'ProdPrice&vat': newTotalPrice,
             ProdTotalSales: newTotalSales,
-            ProdSales: newSales,
-            ProdBenefits: newBenefits
+            ProdSales:      newSales,
+            ProdBenefits:   newBenefits
         };
 
-        // بيانات جدول الإضافة/الشطب
-       const addTrashData = {
-    ID: operationId,
-    AdTrState: state,
-    AdTrSupplier: product.ProdSupplier || '',
-    AdTrSection: product.ProdSection || '',
-    AdTrBarcode: product.ProdBarcode || '',
-    AdTrNmae: product.ProdName || '',
-    AdTrNo: qty,
-    AdTrPrice: newPrice,
-    AdTrPriceVat: vatValue,
-    AdTrTotal: totalWithVat,
-    Timestamp: timestamp,
-    ProductID: productId   // تأكد من إرسال معرف المنتج
-};
+        // ══════ 9. بيانات جدول الإضافة/الشطب ══════
+        const addTrashData = {
+            ID:            operationId,
+            AdTrState:     state,
+            AdTrSupplier:  product.ProdSupplier || '',
+            AdTrSection:   product.ProdSection  || '',
+            AdTrBarcode:   product.ProdBarcode  || '',
+            AdTrNmae:      product.ProdName     || '',
+            AdTrNo:        qty,
+            AdTrPrice:     newPrice,
+            AdTrPriceVat:  vatValue,
+            AdTrTotal:     totalWithVat,
+            Timestamp:     timestamp,
+            ProductID:     productId
+        };
 
-        // 1. حفظ العملية في جدول الإضافة/الشطب
-        const addResult = await callAddTrashScript('create', addTrashData);
-        if (addResult.status !== 'success') throw new Error(addResult.message || 'فشل حفظ العملية');
+// ══════ 10. الحفظ بالتوازي ══════
+const [addRes, updRes] = await Promise.allSettled([
+    callAddTrashScript('create', addTrashData),
+    callProductsScript('update', updateData)
+]);
+const addOk = addRes.status === 'fulfilled' && addRes.value.status === 'success';
+const updOk = updRes.status === 'fulfilled' && updRes.value.status === 'success';
 
-        // 2. تحديث المنتج
-        const updateResult = await callProductsScript('update', updateData);
-        if (updateResult.status !== 'success') throw new Error(updateResult.message || 'فشل تحديث المنتج');
+if (addOk) delete productOperationsCache[productId];
 
-        // 3. تحديث البيانات محلياً
-        const localProduct = allProducts.find(p => String(p.id) === String(productId));
-        if (localProduct) Object.assign(localProduct, updateData);
+if (!addOk || !updOk) {
+    throw new Error(
+        !addOk && !updOk ? 'فشل الحفظ' :
+        !addOk ? 'تم تحديث المخزون لكن فشل تسجيل العملية' :
+                 'تم تسجيل العملية لكن فشل تحديث المخزون'
+    );
+}
 
-        const cashierProduct = productsData.find(p => String(p.id) === String(productId));
-        if (cashierProduct) {
-            cashierProduct.stock = newStock;
-            cashierProduct.spent = newSpent;
-            cashierProduct.ProdTotalSales = newTotalSales;
-            cashierProduct.ProdSales = newSales;
-            cashierProduct.ProdBenefits = newBenefits;
-            cashierProduct.purchasePrice = newPrice;
-            cashierProduct.price = newPrice;
-            cashierProduct.vatPrice = newPrice * (newVatPercent / 100);
-        }
+// ══════ 11. التحديث المحلي (كما هو عندك بدون تغيير) ══════
+const localProduct = allProducts.find(p => String(p.id) === String(productId));
+if (localProduct) Object.assign(localProduct, updateData);
 
-        // نجاح العملية
-        showToast(`✅ تم ${state === 'إضافة' ? 'إضافة' : 'شطب'} ${qty} وحدة بنجاح`, 'success');
-        loadProducts(); // تحديث جدول المنتجات
-        closeAddTrashModal(); // إغلاق النافذة
+const cashierProduct = productsData.find(p => String(p.id) === String(productId));
+if (cashierProduct) {
+    cashierProduct.stock          = newStock;
+    cashierProduct.spent          = newSpent;
+    cashierProduct.ProdTotalSales = newTotalSales;
+    cashierProduct.ProdSales      = newSales;
+    cashierProduct.ProdBenefits   = newBenefits;
+    cashierProduct.purchasePrice  = newPrice;
+    cashierProduct.price          = newPrice;
+    cashierProduct.vatPrice       = newVatP;
+}
+
+// ══════ 12. النجاح: إعادة رسم محلية بدل loadProducts ══════
+showToast(`✅ تم ${state === 'إضافة' ? 'إضافة' : 'شطب'} ${qty} وحدة بنجاح`, 'success');
+closeAddTrashModal();
+applyProductFilters();               // الجدول + الملخص
+renderPopupProducts(productsData);   // قائمة الكاشير المنبثقة
 
     } catch (error) {
         console.error('❌ خطأ في الحفظ:', error);
-        showToast('❌ ' + error.message, 'error');
+        showToast('❌ ' + error.message, 'error', 4000);
     } finally {
         hideLoading();
         saveBtn.disabled = false;
@@ -13459,6 +14183,66 @@ document.getElementById('loadSuppliersBtn').addEventListener('click', function()
     if (editingSupplierId) cancelSupplierEdit();
     loadSuppliers();
 });
+
+
+// ===================================================================
+// صندوق النقود (USB عبر Web Serial)
+// ===================================================================
+const DRAWER_CONFIG = {
+    enabled: true,
+    baudRate: 9600,
+    // ESC p 0 25 250 : أمر ESC/POS القياسي لفتح الدرج
+    command: new Uint8Array([0x1B, 0x70, 0x00, 0x19, 0xFA])
+};
+let drawerPort = null;
+
+// يُستدعى مرة واحدة فقط من الزر لمنح المتصفح صلاحية الوصول للجهاز
+async function connectCashDrawer() {
+    if (!('serial' in navigator)) {
+        showToast('❌ استخدم متصفح Chrome أو Edge على الكمبيوتر', 'error', 3000);
+        return;
+    }
+    try {
+        drawerPort = await navigator.serial.requestPort();
+        showToast('✅ تم ربط صندوق النقود', 'success');
+    } catch (e) {
+        if (e.name !== 'NotFoundError') showToast('❌ ' + e.message, 'error', 3000);
+    }
+}
+
+async function openCashDrawer() {
+    if (!DRAWER_CONFIG.enabled || !('serial' in navigator)) return;
+    try {
+        // الأجهزة التي سبق ربطها تُستعاد بدون نافذة اختيار
+        if (!drawerPort) {
+            const ports = await navigator.serial.getPorts();
+            drawerPort = ports[0] || null;
+        }
+        if (!drawerPort) {
+            showToast('⚠️ صندوق النقود غير مربوط، اضغط "ربط الصندوق"', 'warning', 3000);
+            return;
+        }
+        if (!drawerPort.writable) {
+            await drawerPort.open({ baudRate: DRAWER_CONFIG.baudRate });
+        }
+        const writer = drawerPort.writable.getWriter();
+        try {
+            await writer.write(DRAWER_CONFIG.command);
+        } finally {
+            writer.releaseLock();
+        }
+    } catch (e) {
+        console.error('❌ فشل فتح الصندوق:', e);
+        drawerPort = null; // لإعادة المحاولة في المرة القادمة
+        showToast('⚠️ تعذر فتح صندوق النقود: ' + e.message, 'warning', 3000);
+    }
+}
+
+if ('serial' in navigator) {
+    navigator.serial.addEventListener('disconnect', () => { drawerPort = null; });
+}
+
+
 
 
 
