@@ -9,7 +9,7 @@
     <!-- ===== Leaflet CSS ===== -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=22">
+<link rel="manifest" href="manifest.json?v=23">
 <meta name="theme-color" content="#0d6efd">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
@@ -2247,6 +2247,7 @@ function openWindow(windowId) {
                 setCurrentDate();
                 document.getElementById('barcode-reader').focus();
                 updatePrintButtonVisibility(); // إضافة هذه السطر لتحديث صلاحية الطباعة
+                autoConnectDrawerSilently();
             }
             if (id === 'bills') {
                 setTimeout(() => loadBills(), 500);
@@ -14268,6 +14269,25 @@ if ('serial' in navigator) {
     navigator.serial.addEventListener('disconnect', () => { drawerPort = null; });
 }
 
+ // محاولة إعادة الربط الصامت بجهاز سبق التصريح له، دون إظهار نافذة اختيار
+async function autoConnectDrawerSilently() {
+    if (!DRAWER_CONFIG.enabled) return;
+    if (isInsideIframe()) return; // لا فائدة من المحاولة داخل iframe أصلاً
+    if (!('serial' in navigator)) return;
+
+    try {
+        const ports = await navigator.serial.getPorts(); // لا تحتاج user gesture
+        if (ports.length > 0) {
+            drawerPort = ports[0];
+            showToast('✅ تم إعادة الاتصال بصندوق النقود تلقائيًا', 'success', 2000);
+        } else {
+            // لا يوجد جهاز مصرّح مسبقًا — لا يمكن فتح نافذة الاختيار تلقائيًا
+            console.log('ℹ️ لا يوجد صندوق نقود مربوط مسبقًا، اضغط "ربط" يدويًا لأول مرة');
+        }
+    } catch (e) {
+        console.warn('⚠️ تعذر التحقق من صندوق النقود:', e);
+    }
+}       
 
 
 
