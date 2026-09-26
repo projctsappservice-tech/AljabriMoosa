@@ -9,7 +9,7 @@
     <!-- ===== Leaflet CSS ===== -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=21">
+<link rel="manifest" href="manifest.json?v=22">
 <meta name="theme-color" content="#0d6efd">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
@@ -1290,10 +1290,10 @@
     <i class="fas fa-print"></i> طباعة (F8)
 </button>
 <button class="btn btn-secondary" onclick="connectCashDrawer()" style="padding:8px 16px; border:none; border-radius:8px; height:40px; background:#353636; color:white;">
-    <i class="fas fa-plug"></i> ربط
+    <i class="fas fa-plug"></i>إربط
 </button>
 <button class="btn btn-secondary" onclick="openCashDrawer()" style="padding:8px 16px; border:none; border-radius:8px; height:40px; background:#353636; color:white;">
-    <i class="fas fa-cash-register"></i> فتح
+    <i class="fas fa-cash-register"></i>إفتح
 </button>
 </div>
 
@@ -5010,7 +5010,7 @@ async function refreshAllData(options = {}) {
         overlay.remove();
 
         showToast(`✅ تم حفظ الفاتورة رقم ${billNumber} بنجاح`, 'success');
-        if (paymentMethodSnapshot === 'Cash') openCashDrawer();
+        if (paymentMethodSnapshot === 'Cash' && (parseFloat(paidAmountSnapshot) || 0) > 0) openCashDrawer();
         document.getElementById('btn-print').disabled = false;
         document.getElementById('btn-preview').disabled = false;
 
@@ -14191,13 +14191,34 @@ document.getElementById('loadSuppliersBtn').addEventListener('click', function()
 const DRAWER_CONFIG = {
     enabled: true,
     baudRate: 9600,
-    // ESC p 0 25 250 : أمر ESC/POS القياسي لفتح الدرج
     command: new Uint8Array([0x1B, 0x70, 0x00, 0x19, 0xFA])
 };
 let drawerPort = null;
 
-// يُستدعى مرة واحدة فقط من الزر لمنح المتصفح صلاحية الوصول للجهاز
+// ===== التحقق إذا كان التطبيق يعمل داخل iframe (حالة Apps Script) =====
+function isInsideIframe() {
+    try {
+        return window.self !== window.top;
+    } catch (e) {
+        return true; // في حال منع الوصول لـ window.top، فهذا يعني أننا داخل iframe مقيّد
+    }
+}
+
+// فتح التطبيق في نافذة مستقلة (يحل مشكلة حجب Web Serial داخل iframe)
+function openInStandaloneWindow() {
+    window.open(window.location.href, '_blank');
+}
+
 async function connectCashDrawer() {
+    if (isInsideIframe()) {
+        showConfirmDialog(
+            'صندوق النقود USB لا يعمل داخل هذا الإطار (Google Apps Script). اضغط "نعم" لفتح التطبيق في نافذة مستقلة ثم اربط الصندوق من هناك.',
+            function(confirmed) {
+                if (confirmed) openInStandaloneWindow();
+            }
+        );
+        return;
+    }
     if (!('serial' in navigator)) {
         showToast('❌ استخدم متصفح Chrome أو Edge على الكمبيوتر', 'error', 3000);
         return;
@@ -14211,15 +14232,20 @@ async function connectCashDrawer() {
 }
 
 async function openCashDrawer() {
-    if (!DRAWER_CONFIG.enabled || !('serial' in navigator)) return;
+    if (!DRAWER_CONFIG.enabled) return;
+    if (isInsideIframe()) {
+        // لا نزعج المستخدم بنافذة تأكيد عند الفتح التلقائي بعد الفاتورة، فقط تنبيه بسيط
+        console.warn('⚠️ صندوق النقود لا يعمل داخل iframe — افتح التطبيق في نافذة مستقلة');
+        return;
+    }
+    if (!('serial' in navigator)) return;
     try {
-        // الأجهزة التي سبق ربطها تُستعاد بدون نافذة اختيار
         if (!drawerPort) {
             const ports = await navigator.serial.getPorts();
             drawerPort = ports[0] || null;
         }
         if (!drawerPort) {
-            showToast('⚠️ صندوق النقود غير مربوط، اضغط "ربط الصندوق"', 'warning', 3000);
+            showToast('⚠️ صندوق النقود غير مربوط، اضغط "ربط"', 'warning', 3000);
             return;
         }
         if (!drawerPort.writable) {
@@ -14233,7 +14259,7 @@ async function openCashDrawer() {
         }
     } catch (e) {
         console.error('❌ فشل فتح الصندوق:', e);
-        drawerPort = null; // لإعادة المحاولة في المرة القادمة
+        drawerPort = null;
         showToast('⚠️ تعذر فتح صندوق النقود: ' + e.message, 'warning', 3000);
     }
 }
@@ -14241,7 +14267,6 @@ async function openCashDrawer() {
 if ('serial' in navigator) {
     navigator.serial.addEventListener('disconnect', () => { drawerPort = null; });
 }
-
 
 
 
